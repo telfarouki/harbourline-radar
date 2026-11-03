@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#0b1620;--panel:#10212e;--panel2:#152a3a;--line:#1f3a4d;--text:#e6eef3;--muted:#8fa8b8;--accent:#45d3c2;--accent2:#f2b544;--danger:#ff6b6b;--ok:#5ad38a;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#f3f6f8;--panel:#fff;--panel2:#eef3f6;--line:#d8e1e8;--text:#102030;--muted:#5d7383}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px}
+a{color:var(--accent)}button{font-family:inherit;font-size:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px 9px;width:100%}
+.btn{background:var(--accent);color:#06202a;border:0;border-radius:7px;padding:8px 13px;font-weight:600}.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.btn.danger{background:var(--danger);color:#fff}.btn.small{padding:5px 9px;font-size:13px}.btn:disabled{opacity:.5}
+.hidden{display:none!important}.muted{color:var(--muted)}.mono{font-family:var(--mono)}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--panel)}header b{font-size:17px}header .sp{flex:1}
+.wrap{max-width:1200px;margin:0 auto;padding:18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.gate{max-width:420px;margin:60px auto}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}.tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:7px;padding:7px 12px}.tabs button.on{color:var(--text);border-color:var(--accent)}
+table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.msg{padding:9px 11px;border-radius:7px;background:var(--panel2);margin-top:10px;white-space:pre-wrap}.msg.err{color:var(--danger)}.msg.ok{color:var(--ok)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.grid .full{grid-column:1/-1}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.badge{display:inline-block;border-radius:999px;padding:1px 8px;font-size:12px;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header><b>Harbourline Radar — Admin</b><div class="sp"></div><span class="muted" id="who"></span><a class="btn small secondary" href="index.html">Open Radar</a><button class="btn small secondary hidden" id="out">Sign out</button></header>
+
+<div class="wrap gate" id="gate"><div class="card">
+  <h2 style="margin-top:0">Admin sign-in</h2>
+  <label>E-mail</label><input id="email" type="email">
+  <div id="codeRow" class="hidden" style="margin-top:10px"><label>6-digit code</label><input id="code" class="mono" maxlength="6"></div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="send">Send code</button><button class="btn hidden" id="verify">Verify</button></div>
+  <div class="msg hidden" id="gmsg"></div>
+</div></div>
+
+<div class="wrap hidden" id="app">
+  <div class="tabs">
+    <button data-t="requests" class="on">Access requests <span class="badge" id="nReq"></span></button>
+    <button data-t="users">Users</button>
+    <button data-t="activities">Activities</button>
+    <button data-t="competitors">Competitors</button>
+    <button data-t="import">Import JSON</button>
+  </div>
+
+  <!-- requests -->
+  <div class="card" id="t-requests">
+    <h3 style="margin-top:0">Pending access requests</h3>
+    <table><thead><tr><th>Date</th><th>Name</th><th>E-mail</th><th>Organisation</th><th>Reason</th><th>Role</th><th></th></tr></thead><tbody id="reqBody"></tbody></table>
+    <p class="muted" id="reqEmpty" style="display:none">No pending requests.</p>
+    <details style="margin-top:12px"><summary class="muted">Decided requests</summary><table><tbody id="reqDone"></tbody></table></details>
+  </div>
+
+  <!-- users -->
+  <div class="card hidden" id="t-users">
+    <h3 style="margin-top:0">Approved users</h3>
+    <div class="grid"><div><label>E-mail</label><input id="uEmail"></div><div><label>Name</label><input id="uName"></div><div><label>Organisation</label><input id="uOrg"></div>
+      <div><label>Role</label><select id="uRole"><option value="viewer">Viewer</option><option value="editor">Editor (can add/edit activities)</option><option value="admin">Admin</option></select></div>
+      <div style="align-self:end"><button class="btn" id="uAdd">Add / update user</button></div></div>
+    <div class="msg hidden" id="uMsg"></div>
+    <table style="margin-top:14px"><thead><tr><th>E-mail</th><th>Name</th><th>Organisation</th><th>Role</th><th>Status</th><th>Approved</th><th></th></tr></thead><tbody id="uBody"></tbody></table>
+  </div>
+
+  <!-- activities -->
+  <div class="card hidden" id="t-activities">
+    <h3 style="margin-top:0" id="aTitle">Add an activity</h3>
+    <div class="grid" id="aForm">
+      <div><label>Competitor *</label><select id="aComp"></select></div>
+      <div><label>Country (ISO2) *</label><select id="aCountry"></select></div>
+      <div><label>Category *</label><select id="aCat"></select></div>
+      <div><label>Event type</label><select id="aType"></select></div>
+      <div><label>Date *</label><input id="aDate" type="date"></div>
+      <div><label>Date precision</label><select id="aPrec"><option value="day">Day</option><option value="month">Month</option><option value="year">Year</option></select></div>
+      <div class="full"><label>Title *</label><input id="aTitleIn" maxlength="250"></div>
+      <div class="full"><label>Summary</label><textarea id="aSum" rows="3"></textarea></div>
+      <div><label>Location</label><input id="aLoc"></div>
+      <div><label>Value (US$ million)</label><input id="aVal" type="number" step="0.1"></div>
+      <div><label>Capacity</label><input id="aCap"></div>
+      <div><label>Partners (comma-separated)</label><input id="aPart"></div>
+      <div><label>Source name</label><input id="aSrc"></div>
+      <div><label>Source URL</label><input id="aUrl" type="url"></div>
+      <div><label>Source date</label><input id="aSrcDate" type="date"></div>
+      <div><label>Confidence</label><select id="aConf"><option>high</option><option selected>medium</option><option>low</option></select></div>
+      <div><label>Tags (comma-separated)</label><input id="aTags"></div>
+    </div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="aSave">Save activity</button><button class="btn secondary hidden" id="aCancel">Cancel edit</button><button class="btn danger hidden" id="aDelete">Delete</button></div>
+    <div class="msg hidden" id="aMsg"></div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+    <div class="row"><input id="aSearch" placeholder="Search recorded activities…" style="max-width:360px"><span class="muted" id="aCount"></span></div>
+    <table style="margin-top:10px"><thead><tr><th>Date</th><th>Competitor</th><th>Ctry</th><th>Category</th><th>Title</th><th></th></tr></thead><tbody id="aBody"></tbody></table>
+  </div>
+
+  <!-- competitors -->
+  <div class="card hidden" id="t-competitors">
+    <h3 style="margin-top:0">Competitors</h3>
+    <div class="grid"><div><label>Slug (id) *</label><input id="cId" placeholder="e.g. apm-terminals"></div><div><label>Name *</label><input id="cName"></div>
+      <div><label>Group</label><select id="cGroup"><option value="global_terminal">Global terminal operators</option><option value="regional">Regional / emerging</option><option value="marine_drydock">Marine & drydock</option><option value="logistics_zones">Logistics & zones</option><option value="other">Other</option></select></div>
+      <div><label>HQ (ISO2)</label><input id="cHq" maxlength="2"></div><div><label>Website</label><input id="cWeb"></div>
+      <div style="align-self:end"><button class="btn" id="cSave">Save competitor</button></div></div>
+    <div class="msg hidden" id="cMsg"></div>
+    <table style="margin-top:14px"><thead><tr><th>Slug</th><th>Name</th><th>Group</th><th>HQ</th><th>Records</th><th>Active</th><th></th></tr></thead><tbody id="cBody"></tbody></table>
+  </div>
+
+  <!-- import -->
+  <div class="card hidden" id="t-import">
+    <h3 style="margin-top:0">Import JSON</h3>
+    <p class="muted">Accepts (a) a <b>competitors.json</b> array, or (b) a <b>records_*.json</b> array of activities following SCHEMA.md. Duplicates (same competitor + country + date + title) are skipped automatically.</p>
+    <input type="file" id="impFile" accept=".json" multiple>
+    <textarea id="impText" rows="6" placeholder="…or paste JSON here" style="margin-top:10px"></textarea>
+    <div class="row" style="margin-top:10px"><button class="btn" id="impRun">Validate & import</button></div>
+    <div class="msg hidden" id="impMsg"></div>
+  </div>
+</div>
+
+<script id="countries-data" type="application/json">[{"c": "AF", "n": "Afghanistan"}, {"c": "AL", "n": "Albania"}, {"c": "DZ", "n": "Algeria"}, {"c": "AS", "n": "American Samoa"}, {"c": "AD", "n": "Andorra"}, {"c": "AO", "n": "Angola"}, {"c": "AI", "n": "Anguilla"}, {"c": "AQ", "n": "Antarctica"}, {"c": "AG", "n": "Antigua and Barbuda"}, {"c": "AR", "n": "Argentina"}, {"c": "AM", "n": "Armenia"}, {"c": "AW", "n": "Aruba"}, {"c": "AU", "n": "Australia"}, {"c": "AT", "n": "Austria"}, {"c": "AZ", "n": "Azerbaijan"}, {"c": "BS", "n": "Bahamas"}, {"c": "BH", "n": "Bahrain"}, {"c": "BD", "n": "Bangladesh"}, {"c": "BB", "n": "Barbados"}, {"c": "BY", "n": "Belarus"}, {"c": "BE", "n": "Belgium"}, {"c": "BZ", "n": "Belize"}, {"c": "BJ", "n": "Benin"}, {"c": "BM", "n": "Bermuda"}, {"c": "BT", "n": "Bhutan"}, {"c": "BO", "n": "Bolivia"}, {"c": "BQ", "n": "Bonaire"}, {"c": "BA", "n": "Bosnia and Herzegovina"}, {"c": "BW", "n": "Botswana"}, {"c": "BV", "n": "Bouvet Island"}, {"c": "BR", "n": "Brazil"}, {"c": "IO", "n": "British Indian Ocean Territory"}, {"c": "VG", "n": "British Virgin Islands"}, {"c": "BN", "n": "Brunei"}, {"c": "BG", "n": "Bulgaria"}, {"c": "BF", "n": "Burkina Faso"}, {"c": "BI", "n": "Burundi"}, {"c": "KH", "n": "Cambodia"}, {"c": "CM", "n": "Cameroon"}, {"c": "CA", "n": "Canada"}, {"c": "CV", "n": "Cape Verde"}, {"c": "KY", "n": "Cayman Islands"}, {"c": "CF", "n": "Central African Republic"}, {"c": "TD", "n": "Chad"}, {"c": "CL", "n": "Chile"}, {"c": "CN", "n": "China"}, {"c": "CX", "n": "Christmas Island"}, {"c": "CC", "n": "Cocos (Keeling) Islands"}, {"c": "CO", "n": "Colombia"}, {"c": "KM", "n": "Comoros"}, {"c": "CG", "n": "Congo (Brazzaville)"}, {"c": "CK", "n": "Cook Islands"}, {"c": "CR", "n": "Costa Rica"}, {"c": "HR", "n": "Croatia"}, {"c": "CU", "n": "Cuba"}, {"c": "CW", "n": "Curaçao"}, {"c": "CY", "n": "Cyprus"}, {"c": "CZ", "n": "Czech Republic"}, {"c": "CI", "n": "Côte d’Ivoire"}, {"c": "CD", "n": "DR Congo"}, {"c": "DK", "n": "Denmark"}, {"c": "DJ", "n": "Djibouti"}, {"c": "DM", "n": "Dominica"}, {"c": "DO", "n": "Dominican Republic"}, {"c": "EC", "n": "Ecuador"}, {"c": "EG", "n": "Egypt"}, {"c": "SV", "n": "El Salvador"}, {"c": "GQ", "n": "Equatorial Guinea"}, {"c": "ER", "n": "Eritrea"}, {"c": "EE", "n": "Estonia"}, {"c": "SZ", "n": "Eswatini (Swaziland)"}, {"c": "ET", "n": "Ethiopia"}, {"c": "FK", "n": "Falkland Islands"}, {"c": "FO", "n": "Faroe Islands"}, {"c": "FJ", "n": "Fiji"}, {"c": "FI", "n": "Finland"}, {"c": "FR", "n": "France"}, {"c": "GF", "n": "French Guiana"}, {"c": "PF", "n": "French Polynesia"}, {"c": "TF", "n": "French Southern Territories"}, {"c": "GA", "n": "Gabon"}, {"c": "GM", "n": "Gambia"}, {"c": "GE", "n": "Georgia"}, {"c": "DE", "n": "Germany"}, {"c": "GH", "n": "Ghana"}, {"c": "GI", "n": "Gibraltar"}, {"c": "XX", "n": "Global / multi-country"}, {"c": "GR", "n": "Greece"}, {"c": "GL", "n": "Greenland"}, {"c": "GD", "n": "Grenada"}, {"c": "GP", "n": "Guadeloupe"}, {"c": "GU", "n": "Guam"}, {"c": "GT", "n": "Guatemala"}, {"c": "GG", "n": "Guernsey"}, {"c": "GN", "n": "Guinea"}, {"c": "GW", "n": "Guinea-Bissau"}, {"c": "GY", "n": "Guyana"}, {"c": "HT", "n": "Haiti"}, {"c": "HM", "n": "Heard Island and McDonald Islands"}, {"c": "HN", "n": "Honduras"}, {"c": "HK", "n": "Hong Kong"}, {"c": "HU", "n": "Hungary"}, {"c": "IS", "n": "Iceland"}, {"c": "IN", "n": "India"}, {"c": "ID", "n": "Indonesia"}, {"c": "IR", "n": "Iran"}, {"c": "IQ", "n": "Iraq"}, {"c": "IE", "n": "Ireland"}, {"c": "IM", "n": "Isle of Man"}, {"c": "IL", "n": "Israel"}, {"c": "IT", "n": "Italy"}, {"c": "JM", "n": "Jamaica"}, {"c": "JP", "n": "Japan"}, {"c": "JE", "n": "Jersey"}, {"c": "JO", "n": "Jordan"}, {"c": "KZ", "n": "Kazakhstan"}, {"c": "KE", "n": "Kenya"}, {"c": "KI", "n": "Kiribati"}, {"c": "KW", "n": "Kuwait"}, {"c": "KG", "n": "Kyrgyzstan"}, {"c": "LA", "n": "Laos"}, {"c": "LV", "n": "Latvia"}, {"c": "LB", "n": "Lebanon"}, {"c": "LS", "n": "Lesotho"}, {"c": "LR", "n": "Liberia"}, {"c": "LY", "n": "Libya"}, {"c": "LI", "n": "Liechtenstein"}, {"c": "LT", "n": "Lithuania"}, {"c": "LU", "n": "Luxembourg"}, {"c": "MO", "n": "Macao"}, {"c": "MG", "n": "Madagascar"}, {"c": "MW", "n": "Malawi"}, {"c": "MY", "n": "Malaysia"}, {"c": "MV", "n": "Maldives"}, {"c": "ML", "n": "Mali"}, {"c": "MT", "n": "Malta"}, {"c": "MH", "n": "Marshall Islands"}, {"c": "MQ", "n": "Martinique"}, {"c": "MR", "n": "Mauritania"}, {"c": "MU", "n": "Mauritius"}, {"c": "YT", "n": "Mayotte"}, {"c": "MX", "n": "Mexico"}, {"c": "FM", "n": "Micronesia"}, {"c": "MD", "n": "Moldova"}, {"c": "MC", "n": "Monaco"}, {"c": "MN", "n": "Mongolia"}, {"c": "ME", "n": "Montenegro"}, {"c": "MS", "n": "Montserrat"}, {"c": "MA", "n": "Morocco"}, {"c": "MZ", "n": "Mozambique"}, {"c": "MM", "n": "Myanmar"}, {"c": "NA", "n": "Namibia"}, {"c": "NR", "n": "Nauru"}, {"c": "NP", "n": "Nepal"}, {"c": "NL", "n": "Netherlands"}, {"c": "NC", "n": "New Caledonia"}, {"c": "NZ", "n": "New Zealand"}, {"c": "NI", "n": "Nicaragua"}, {"c": "NE", "n": "Niger"}, {"c": "NG", "n": "Nigeria"}, {"c": "NU", "n": "Niue"}, {"c": "NF", "n": "Norfolk Island"}, {"c": "KP", "n": "North Korea"}, {"c": "MK", "n": "North Macedonia"}, {"c": "MP", "n": "Northern Mariana Islands"}, {"c": "NO", "n": "Norway"}, {"c": "OM", "n": "Oman"}, {"c": "PK", "n": "Pakistan"}, {"c": "PW", "n": "Palau"}, {"c": "PS", "n": "Palestine"}, {"c": "PA", "n": "Panama"}, {"c": "PG", "n": "Papua New Guinea"}, {"c": "PY", "n": "Paraguay"}, {"c": "PE", "n": "Peru"}, {"c": "PH", "n": "Philippines"}, {"c": "PN", "n": "Pitcairn"}, {"c": "PL", "n": "Poland"}, {"c": "PT", "n": "Portugal"}, {"c": "PR", "n": "Puerto Rico"}, {"c": "QA", "n": "Qatar"}, {"c": "RO", "n": "Romania"}, {"c": "RU", "n": "Russia"}, {"c": "RW", "n": "Rwanda"}, {"c": "RE", "n": "Réunion"}, {"c": "BL", "n": "Saint Barthélemy"}, {"c": "SH", "n": "Saint Helena"}, {"c": "KN", "n": "Saint Kitts and Nevis"}, {"c": "LC", "n": "Saint Lucia"}, {"c": "MF", "n": "Saint Martin (French part)"}, {"c": "PM", "n": "Saint Pierre and Miquelon"}, {"c": "VC", "n": "Saint Vincent and the Grenadines"}, {"c": "WS", "n": "Samoa"}, {"c": "SM", "n": "San Marino"}, {"c": "ST", "n": "Sao Tome and Principe"}, {"c": "SA", "n": "Saudi Arabia"}, {"c": "SN", "n": "Senegal"}, {"c": "RS", "n": "Serbia"}, {"c": "SC", "n": "Seychelles"}, {"c": "SL", "n": "Sierra Leone"}, {"c": "SG", "n": "Singapore"}, {"c": "SX", "n": "Sint Maarten (Dutch part)"}, {"c": "SK", "n": "Slovakia"}, {"c": "SI", "n": "Slovenia"}, {"c": "SB", "n": "Solomon Islands"}, {"c": "SO", "n": "Somalia"}, {"c": "ZA", "n": "South Africa"}, {"c": "GS", "n": "South Georgia and the South Sandwich Islands"}, {"c": "KR", "n": "South Korea"}, {"c": "SS", "n": "South Sudan"}, {"c": "ES", "n": "Spain"}, {"c": "LK", "n": "Sri Lanka"}, {"c": "SD", "n": "Sudan"}, {"c": "SR", "n": "Suriname"}, {"c": "SJ", "n": "Svalbard and Jan Mayen"}, {"c": "SE", "n": "Sweden"}, {"c": "CH", "n": "Switzerland"}, {"c": "SY", "n": "Syria"}, {"c": "TW", "n": "Taiwan"}, {"c": "TJ", "n": "Tajikistan"}, {"c": "TZ", "n": "Tanzania"}, {"c": "TH", "n": "Thailand"}, {"c": "TL", "n": "Timor-Leste"}, {"c": "TG", "n": "Togo"}, {"c": "TK", "n": "Tokelau"}, {"c": "TO", "n": "Tonga"}, {"c": "TT", "n": "Trinidad and Tobago"}, {"c": "TN", "n": "Tunisia"}, {"c": "TR", "n": "Turkey"}, {"c": "TM", "n": "Turkmenistan"}, {"c": "TC", "n": "Turks and Caicos Islands"}, {"c": "TV", "n": "Tuvalu"}, {"c": "VI", "n": "US Virgin Islands"}, {"c": "UG", "n": "Uganda"}, {"c": "UA", "n": "Ukraine"}, {"c": "AE", "n": "United Arab Emirates"}, {"c": "GB", "n": "United Kingdom"}, {"c": "US", "n": "United States"}, {"c": "UM", "n": "United States Minor Outlying Islands"}, {"c": "UY", "n": "Uruguay"}, {"c": "UZ", "n": "Uzbekistan"}, {"c": "VU", "n": "Vanuatu"}, {"c": "VA", "n": "Vatican"}, {"c": "VE", "n": "Venezuela"}, {"c": "VN", "n": "Vietnam"}, {"c": "WF", "n": "Wallis and Futuna"}, {"c": "EH", "n": "Western Sahara"}, {"c": "YE", "n": "Yemen"}, {"c": "ZM", "n": "Zambia"}, {"c": "ZW", "n": "Zimbabwe"}, {"c": "AX", "n": "Åland Islands"}]</script>
+<script>
+const SUPABASE_URL  = "https://kccaysszxbxalwltfqyt.supabase.co";
+const SUPABASE_ANON = "sb_publishable_4-I-q9HdXEJ1WW8V9YRGFw_SQQGobnz";
+const CATS={port_operations:'Port operations',logistics_supply_chain:'Logistics & supply chain',free_economic_zones:'Free & economic zones',drydocking:'Drydocking',feedering:'Feedering',marine_services:'Marine services'};
+const ETYPES=['concession_award','acquisition','divestment','investment','expansion','greenfield','partnership_jv','contract','service_launch','operational_milestone','financing','regulatory','exit_or_loss','other'];
+const COUNTRIES=JSON.parse(document.getElementById('countries-data').textContent);const ISO=new Set(COUNTRIES.map(c=>c.c));
+const $=s=>document.querySelector(s);const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+let me,profile,competitors=[],activities=[],editId=null;
+function msg(el,t,c){el.textContent=t;el.className='msg '+(c||'');el.classList.remove('hidden');}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* gate */
+$('#send').onclick=async()=>{const email=$('#email').value.trim().toLowerCase();const {error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false}});if(error){msg($('#gmsg'),error.message,'err');return;}msg($('#gmsg'),'Code sent.','ok');$('#codeRow').classList.remove('hidden');$('#verify').classList.remove('hidden');$('#send').classList.add('hidden');};
+$('#verify').onclick=async()=>{const {error}=await sb.auth.verifyOtp({email:$('#email').value.trim().toLowerCase(),token:$('#code').value.trim(),type:'email'});if(error){msg($('#gmsg'),error.message,'err');return;}boot();};
+$('#code').addEventListener('keydown',e=>{if(e.key==='Enter')$('#verify').click();});
+$('#out').onclick=async()=>{await sb.auth.signOut();location.reload();};
+
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){$('#gate').classList.remove('hidden');return;}
+  me=session.user;
+  const {data:p}=await sb.from('app_users').select('*').eq('email',me.email.toLowerCase()).maybeSingle();profile=p;
+  if(!p||p.status!=='approved'||p.role==='viewer'){msg($('#gmsg'),'This account is not an editor/admin.','err');$('#out').classList.remove('hidden');return;}
+  $('#gate').classList.add('hidden');$('#app').classList.remove('hidden');$('#who').textContent=me.email+' ('+p.role+')';$('#out').classList.remove('hidden');
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+  if(p.role!=='admin'){document.querySelector('[data-t=requests]').classList.add('hidden');document.querySelector('[data-t=users]').classList.add('hidden');showTab('activities');}
+  await Promise.all([loadRequests(),loadUsers(),loadCompetitors(),loadActivities()]);
+  const m=location.hash.match(/edit=([0-9a-f-]+)/);if(m){showTab('activities');startEdit(m[1]);}
+}
+function showTab(t){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));['requests','users','activities','competitors','import'].forEach(k=>$('#t-'+k).classList.toggle('hidden',k!==t));}
+
+/* requests */
+async function loadRequests(){
+  if(profile.role!=='admin')return;
+  const {data}=await sb.from('access_requests').select('*').order('created_at',{ascending:false});
+  const pend=(data||[]).filter(r=>r.status==='pending'),done=(data||[]).filter(r=>r.status!=='pending');
+  $('#nReq').textContent=pend.length||'';$('#reqEmpty').style.display=pend.length?'none':'';
+  $('#reqBody').innerHTML=pend.map(r=>`<tr><td class="mono">${r.created_at.slice(0,10)}</td><td>${esc(r.full_name)}</td><td>${esc(r.email)}</td><td>${esc(r.organisation)}</td><td>${esc(r.reason)}</td>
+    <td><select data-role="${r.id}"><option value="viewer">Viewer</option><option value="editor">Editor</option></select></td>
+    <td class="row"><button class="btn small" data-ok="${r.id}">Approve</button><button class="btn small danger" data-no="${r.id}">Reject</button></td></tr>`).join('');
+  $('#reqDone').innerHTML=done.slice(0,50).map(r=>`<tr><td class="mono">${r.created_at.slice(0,10)}</td><td>${esc(r.email)}</td><td>${esc(r.full_name)}</td><td><span class="badge">${r.status}</span></td></tr>`).join('');
+  $('#reqBody').querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>decide(b.dataset.ok,true));
+  $('#reqBody').querySelectorAll('[data-no]').forEach(b=>b.onclick=()=>decide(b.dataset.no,false));
+}
+async function decide(id,ok){const role=document.querySelector(`[data-role="${id}"]`).value;const {error}=await sb.rpc('decide_access_request',{p_id:id,p_approve:ok,p_role:role});if(error)alert(error.message);await loadRequests();await loadUsers();}
+
+/* users */
+async function loadUsers(){
+  if(profile.role!=='admin')return;
+  const {data}=await sb.from('app_users').select('*').order('created_at',{ascending:false});
+  $('#uBody').innerHTML=(data||[]).map(u=>`<tr><td>${esc(u.email)}</td><td>${esc(u.full_name)}</td><td>${esc(u.organisation)}</td><td><span class="badge">${u.role}</span></td><td>${u.status}</td><td class="mono">${(u.approved_at||'').slice(0,10)}</td>
+    <td class="row">${u.status==='approved'?`<button class="btn small secondary" data-block="${u.email}">Block</button>`:`<button class="btn small" data-unblock="${u.email}">Re-activate</button>`}</td></tr>`).join('');
+  $('#uBody').querySelectorAll('[data-block]').forEach(b=>b.onclick=()=>setStatus(b.dataset.block,'blocked'));
+  $('#uBody').querySelectorAll('[data-unblock]').forEach(b=>b.onclick=()=>setStatus(b.dataset.unblock,'approved'));
+}
+async function setStatus(email,status){const {error}=await sb.from('app_users').update({status}).eq('email',email);if(error)alert(error.message);loadUsers();}
+$('#uAdd').onclick=async()=>{const {error}=await sb.rpc('upsert_app_user',{p_email:$('#uEmail').value,p_full_name:$('#uName').value,p_organisation:$('#uOrg').value,p_role:$('#uRole').value,p_status:'approved'});msg($('#uMsg'),error?error.message:'Saved.',error?'err':'ok');loadUsers();};
+
+/* competitors */
+async function loadCompetitors(){
+  const {data}=await sb.from('competitors').select('*').order('name');competitors=data||[];
+  $('#aComp').innerHTML=competitors.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  renderCompetitors();
+}
+function renderCompetitors(){
+  const counts={};activities.forEach(a=>counts[a.competitor_id]=(counts[a.competitor_id]||0)+1);
+  $('#cBody').innerHTML=competitors.map(c=>`<tr><td class="mono">${c.id}</td><td>${esc(c.name)}</td><td>${c.group}</td><td class="mono">${c.hq||''}</td><td class="mono">${counts[c.id]||0}</td><td>${c.active?'yes':'no'}</td>
+   <td class="row"><button class="btn small secondary" data-cedit="${c.id}">Edit</button><button class="btn small secondary" data-ctog="${c.id}">${c.active?'Deactivate':'Activate'}</button></td></tr>`).join('');
+  $('#cBody').querySelectorAll('[data-cedit]').forEach(b=>b.onclick=()=>{const c=competitors.find(x=>x.id===b.dataset.cedit);$('#cId').value=c.id;$('#cName').value=c.name;$('#cGroup').value=c.group;$('#cHq').value=c.hq||'';$('#cWeb').value=c.website||'';});
+  $('#cBody').querySelectorAll('[data-ctog]').forEach(b=>b.onclick=async()=>{const c=competitors.find(x=>x.id===b.dataset.ctog);await sb.from('competitors').update({active:!c.active}).eq('id',c.id);loadCompetitors();});
+}
+$('#cSave').onclick=async()=>{
+  const row={id:$('#cId').value.trim().toLowerCase(),name:$('#cName').value.trim(),group:$('#cGroup').value,hq:($('#cHq').value.trim().toUpperCase()||null),website:$('#cWeb').value.trim()||null};
+  if(!row.id||!row.name){msg($('#cMsg'),'Slug and name are required.','err');return;}
+  const {error}=await sb.from('competitors').upsert(row);msg($('#cMsg'),error?error.message:'Saved.',error?'err':'ok');loadCompetitors();
+};
+
+/* activities */
+async function loadActivities(){
+  activities=[];let from=0;
+  while(true){const {data}=await sb.from('activities').select('id,competitor_id,country,category,event_type,event_date,date_precision,title,summary,location,value_usd_m,capacity,partners,source_name,source_url,source_date,confidence,tags').order('event_date',{ascending:false}).range(from,from+999);activities=activities.concat(data||[]);if(!data||data.length<1000)break;from+=1000;}
+  renderActivities();renderCompetitors();
+}
+function renderActivities(){
+  const q=($('#aSearch').value||'').toLowerCase();
+  const list=activities.filter(a=>!q||(a.title+' '+(a.summary||'')+' '+a.country+' '+a.competitor_id).toLowerCase().includes(q)).slice(0,300);
+  $('#aCount').textContent=activities.length+' records'+(q?' · showing '+list.length:'');
+  const cn=Object.fromEntries(competitors.map(c=>[c.id,c.name]));
+  $('#aBody').innerHTML=list.map(a=>`<tr><td class="mono">${a.event_date}</td><td>${esc(cn[a.competitor_id]||a.competitor_id)}</td><td class="mono">${a.country}</td><td>${CATS[a.category]}</td><td>${esc(a.title)}</td><td><button class="btn small secondary" data-edit="${a.id}">Edit</button></td></tr>`).join('');
+  $('#aBody').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
+}
+$('#aSearch').oninput=renderActivities;
+function fillForm(){
+  $('#aCat').innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+  $('#aType').innerHTML=ETYPES.map(t=>`<option value="${t}">${t.replace(/_/g,' ')}</option>`).join('');
+  $('#aCountry').innerHTML=COUNTRIES.map(c=>`<option value="${c.c}">${c.n} (${c.c})</option>`).join('');
+}
+fillForm();
+function startEdit(id){
+  const a=activities.find(x=>x.id===id);if(!a)return;editId=id;$('#aTitle').textContent='Edit activity';
+  $('#aComp').value=a.competitor_id;$('#aCountry').value=a.country;$('#aCat').value=a.category;$('#aType').value=a.event_type;$('#aDate').value=a.event_date;$('#aPrec').value=a.date_precision;
+  $('#aTitleIn').value=a.title;$('#aSum').value=a.summary||'';$('#aLoc').value=a.location||'';$('#aVal').value=a.value_usd_m??'';$('#aCap').value=a.capacity||'';$('#aPart').value=(a.partners||[]).join(', ');
+  $('#aSrc').value=a.source_name||'';$('#aUrl').value=a.source_url||'';$('#aSrcDate').value=a.source_date||'';$('#aConf').value=a.confidence;$('#aTags').value=(a.tags||[]).join(', ');
+  $('#aCancel').classList.remove('hidden');$('#aDelete').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});
+}
+function resetForm(){editId=null;$('#aTitle').textContent='Add an activity';$('#aForm').querySelectorAll('input,textarea').forEach(i=>i.value='');$('#aConf').value='medium';$('#aPrec').value='day';$('#aCancel').classList.add('hidden');$('#aDelete').classList.add('hidden');}
+$('#aCancel').onclick=resetForm;
+const splitList=s=>s.split(',').map(x=>x.trim()).filter(Boolean);
+$('#aSave').onclick=async()=>{
+  const row={competitor_id:$('#aComp').value,country:$('#aCountry').value,category:$('#aCat').value,event_type:$('#aType').value,event_date:$('#aDate').value,date_precision:$('#aPrec').value,
+    title:$('#aTitleIn').value.trim(),summary:$('#aSum').value.trim()||null,location:$('#aLoc').value.trim()||null,value_usd_m:$('#aVal').value===''?null:Number($('#aVal').value),capacity:$('#aCap').value.trim()||null,
+    partners:splitList($('#aPart').value),source_name:$('#aSrc').value.trim()||null,source_url:$('#aUrl').value.trim()||null,source_date:$('#aSrcDate').value||null,confidence:$('#aConf').value,tags:splitList($('#aTags').value)};
+  if(!row.title||!row.event_date){msg($('#aMsg'),'Title and date are required.','err');return;}
+  const r=editId?await sb.from('activities').update(row).eq('id',editId):await sb.from('activities').insert(row);
+  msg($('#aMsg'),r.error?r.error.message:'Saved.',r.error?'err':'ok');if(!r.error){resetForm();loadActivities();}
+};
+$('#aDelete').onclick=async()=>{if(!editId||!confirm('Delete this activity?'))return;const {error}=await sb.from('activities').delete().eq('id',editId);msg($('#aMsg'),error?error.message:'Deleted.',error?'err':'ok');resetForm();loadActivities();};
+
+/* import */
+function validateRecord(r,i){
+  const e=[];const comp=new Set(competitors.map(c=>c.id));
+  if(!comp.has(r.competitor))e.push('unknown competitor "'+r.competitor+'"');
+  if(!ISO.has(r.country))e.push('bad country "'+r.country+'"');
+  if(!CATS[r.category])e.push('bad category "'+r.category+'"');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(r.event_date||''))e.push('bad event_date');
+  if(!r.title)e.push('missing title');
+  return e.length?`#${i+1}: ${e.join('; ')}`:null;
+}
+$('#impRun').onclick=async()=>{
+  let texts=[];const files=$('#impFile').files;
+  for(const f of files)texts.push(await f.text());
+  if($('#impText').value.trim())texts.push($('#impText').value);
+  if(!texts.length){msg($('#impMsg'),'Choose a file or paste JSON.','err');return;}
+  let log=[],inserted=0,skipped=0;
+  for(const t of texts){
+    let arr;try{arr=JSON.parse(t);}catch(e){log.push('Invalid JSON: '+e.message);continue;}
+    if(!Array.isArray(arr)){log.push('Expected a JSON array.');continue;}
+    if(arr.length&&arr[0].id&&arr[0].name&&!arr[0].title){ // competitors file
+      const {error}=await sb.from('competitors').upsert(arr.map(c=>({id:c.id,name:c.name,group:c.group||'other',hq:c.hq||null,website:c.website||null})));
+      log.push(error?('Competitors: '+error.message):('Competitors upserted: '+arr.length));await loadCompetitors();continue;
+    }
+    const errs=arr.map(validateRecord).filter(Boolean);
+    if(errs.length){log.push('Validation errors (file skipped):\n'+errs.slice(0,20).join('\n')+(errs.length>20?'\n…':''));continue;}
+    const rows=arr.map(r=>({competitor_id:r.competitor,country:r.country,category:r.category,event_type:ETYPES.includes(r.event_type)?r.event_type:'other',event_date:r.event_date,date_precision:r.date_precision||'day',
+      title:r.title,summary:r.summary||null,location:r.location||null,value_usd_m:r.value_usd_m==null?null:Number(r.value_usd_m),capacity:r.capacity||null,partners:r.partners||[],
+      source_name:r.source_name||null,source_url:r.source_url||null,source_date:/^\d{4}-\d{2}-\d{2}$/.test(r.source_date||'')?r.source_date:null,confidence:['high','medium','low'].includes(r.confidence)?r.confidence:'medium',tags:r.tags||[]}));
+    for(let i=0;i<rows.length;i+=200){
+      const chunk=rows.slice(i,i+200);
+      const {data,error}=await sb.from('activities').upsert(chunk,{onConflict:'competitor_id,country,event_date,title',ignoreDuplicates:true}).select('id');
+      if(error){ // fallback one by one (unique index on lower(title) is not usable by onConflict)
+        for(const row of chunk){const r2=await sb.from('activities').insert(row).select('id');if(r2.error){if(/duplicate|unique/i.test(r2.error.message))skipped++;else log.push('Row "'+row.title.slice(0,60)+'": '+r2.error.message);}else inserted++;}
+      }else{inserted+=(data||[]).length;skipped+=chunk.length-(data||[]).length;}
+    }
+  }
+  log.unshift(`Inserted ${inserted} activities, skipped ${skipped} duplicates.`);
+  msg($('#impMsg'),log.join('\n'),'ok');$('#impFile').value='';$('#impText').value='';await loadActivities();
+};
+boot();
+</script>
+</body>
+</html>

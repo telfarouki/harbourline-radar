@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harbourline Radar</title>
+<meta name="description" content="Competitor activity monitor — ports, logistics, zones, drydocking, feedering, marine services">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='44' fill='%230b2a3a'/><circle cx='50' cy='50' r='30' fill='none' stroke='%2345d3c2' stroke-width='3'/><circle cx='50' cy='50' r='14' fill='none' stroke='%2345d3c2' stroke-width='3'/><path d='M50 50 L82 28' stroke='%23f2b544' stroke-width='5' stroke-linecap='round'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#0b1620;--panel:#10212e;--panel2:#152a3a;--line:#1f3a4d;--text:#e6eef3;--muted:#8fa8b8;
+  --accent:#45d3c2;--accent2:#f2b544;--danger:#ff6b6b;--ok:#5ad38a;
+  --c-port:#45d3c2;--c-log:#f2b544;--c-zone:#b48cff;--c-dry:#ff8c69;--c-feed:#6ab4ff;--c-mar:#5ad38a;
+  --radius:10px;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#f3f6f8;--panel:#ffffff;--panel2:#eef3f6;--line:#d8e1e8;--text:#102030;--muted:#5d7383;
+}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.45}
+a{color:var(--accent)}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.btn{background:var(--accent);color:#06202a;border:0;border-radius:8px;padding:10px 16px;font-weight:600}
+.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono)}
+/* ---- header ---- */
+header{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
+header .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.2px}
+header .logo svg{width:28px;height:28px}
+header .spacer{flex:1}
+header .who{font-size:13px;color:var(--muted)}
+/* ---- gate ---- */
+.gate{max-width:440px;margin:60px auto;padding:0 16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.card h1{font-size:22px;margin:0 0 6px}
+.card p{margin:6px 0 14px;color:var(--muted)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+.msg{padding:10px 12px;border-radius:8px;background:var(--panel2);font-size:14px;margin-top:10px}
+.msg.err{color:var(--danger)}.msg.ok{color:var(--ok)}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tabs button{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px}
+.tabs button.on{color:var(--text);border-color:var(--accent)}
+/* ---- layout ---- */
+.app{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 57px)}
+aside{border-right:1px solid var(--line);background:var(--panel);padding:16px;overflow:auto;max-height:calc(100vh - 57px);position:sticky;top:57px}
+main{padding:18px 22px;min-width:0}
+.sec{margin-bottom:18px}
+.sec h3{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:0 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:5px 10px;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--cc)}
+.chip.on{color:var(--text);border-color:var(--cc);background:color-mix(in srgb,var(--cc) 18%,var(--panel2))}
+.chip .n{font-family:var(--mono);font-size:11px;opacity:.8}
+.countrylist{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:6px;background:var(--panel2)}
+.countrylist div{padding:6px 10px;cursor:pointer;display:flex;justify-content:space-between;font-size:14px}
+.countrylist div:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.countrylist div.on{background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--text)}
+.countrylist .n{font-family:var(--mono);font-size:11px;color:var(--muted)}
+/* ---- main ---- */
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.toolbar h2{margin:0;font-size:20px;flex:1}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted)}
+.stat b{color:var(--text);font-family:var(--mono);font-size:15px;margin-right:6px}
+.ym{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:18px 0 8px;font-family:var(--mono)}
+.act{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cc);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
+.act:hover{border-color:var(--cc)}
+.act .date{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:3px;white-space:nowrap}
+.act .t{font-weight:600}
+.act .meta{font-size:13px;color:var(--muted);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap}
+.act .meta .k{color:var(--cc)}
+.act .val{font-family:var(--mono);font-size:13px;color:var(--accent2);white-space:nowrap}
+.flag{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+/* ---- drawer ---- */
+.drawer{position:fixed;top:0;right:0;width:min(560px,100vw);height:100vh;background:var(--panel);border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(0,0,0,.35);z-index:20;padding:22px;overflow:auto;transform:translateX(100%);transition:transform .2s}
+.drawer.open{transform:none}
+.drawer h2{margin:8px 0 6px;font-size:20px}
+.drawer .kv{display:grid;grid-template-columns:130px 1fr;gap:6px 12px;font-size:14px;margin-top:14px}
+.drawer .kv dt{color:var(--muted)}.drawer .kv dd{margin:0}
+.drawer .close{position:absolute;top:14px;right:14px}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:19}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;background:color-mix(in srgb,var(--cc) 20%,transparent);color:var(--cc);border:1px solid var(--cc)}
+/* ---- timeline / matrix ---- */
+.matrix{width:100%;border-collapse:collapse;font-size:13px}
+.matrix th,.matrix td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+.matrix th:first-child,.matrix td:first-child{text-align:left}
+.matrix td.n{cursor:pointer;font-family:var(--mono)}
+.matrix td.n:hover{background:color-mix(in srgb,var(--accent) 15%,transparent)}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line)}
+  .act{grid-template-columns:1fr}
+  .drawer .kv{grid-template-columns:1fr}
+}
+@media print{header,aside,.toolbar,.drawer,.backdrop{display:none!important}.app{display:block}main{padding:0}.act{break-inside:avoid;cursor:default}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#0b2a3a"/><circle cx="50" cy="50" r="30" fill="none" stroke="#45d3c2" stroke-width="3"/><circle cx="50" cy="50" r="14" fill="none" stroke="#45d3c2" stroke-width="3"/><path d="M50 50 L82 28" stroke="#f2b544" stroke-width="5" stroke-linecap="round"/></svg>
+    Harbourline Radar
+  </div>
+  <div class="spacer"></div>
+  <span class="who" id="who"></span>
+  <a class="btn small secondary hidden" id="adminLink" href="admin.html">Admin</a>
+  <button class="btn small secondary hidden" id="signout">Sign out</button>
+</header>
+
+<!-- ============ GATE ============ -->
+<div class="gate" id="gate">
+  <div class="card">
+    <h1>Competitor activity monitor</h1>
+    <p>Port operations · Logistics & supply chain · Free & economic zones · Drydocking · Feedering · Marine services — worldwide, country by country.</p>
+    <div class="tabs"><button id="tabSignin" class="on">Sign in</button><button id="tabRequest">Request access</button></div>
+
+    <div id="signinForm">
+      <div class="field"><label>E-mail</label><input id="siEmail" type="email" placeholder="you@company.com" autocomplete="email"></div>
+      <div id="codeRow" class="field hidden"><label>6-digit code (check your e-mail)</label><input id="siCode" inputmode="numeric" maxlength="6" placeholder="123456" class="mono"></div>
+      <button class="btn" id="siSend">Send code</button>
+      <button class="btn hidden" id="siVerify">Verify code</button>
+      <div class="msg hidden" id="siMsg"></div>
+    </div>
+
+    <div id="requestForm" class="hidden">
+      <div class="field"><label>Full name</label><input id="rqName" maxlength="120"></div>
+      <div class="field"><label>E-mail</label><input id="rqEmail" type="email" maxlength="120"></div>
+      <div class="field"><label>Organisation</label><input id="rqOrg" maxlength="120"></div>
+      <div class="field"><label>Why do you need access?</label><textarea id="rqReason" rows="3" maxlength="500"></textarea></div>
+      <button class="btn" id="rqSend">Submit request</button>
+      <div class="msg hidden" id="rqMsg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="gate hidden" id="pending">
+  <div class="card"><h1>Access pending</h1><p>You are signed in as <b id="pendingEmail"></b> but your access has not been approved yet. You will be able to use the Radar once the administrator approves your request.</p><button class="btn secondary" id="pendingOut">Sign out</button></div>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="app hidden" id="app">
+  <aside>
+    <div class="sec">
+      <h3>Search</h3>
+      <input id="q" placeholder="Search titles, summaries, locations…">
+    </div>
+    <div class="sec">
+      <h3>Country</h3>
+      <input id="cFilter" placeholder="Type to filter countries…">
+      <div class="countrylist" id="countryList"></div>
+      <div style="margin-top:6px"><button class="btn small secondary" id="cAll">All countries</button></div>
+    </div>
+    <div class="sec">
+      <h3>Activity</h3>
+      <div class="chips" id="catChips"></div>
+    </div>
+    <div class="sec">
+      <h3>Competitor</h3>
+      <select id="comp"><option value="">All competitors</option></select>
+    </div>
+    <div class="sec">
+      <h3>Period</h3>
+      <div style="display:flex;gap:6px"><input id="dFrom" type="date"><input id="dTo" type="date"></div>
+    </div>
+    <div class="sec">
+      <h3>Event type</h3>
+      <select id="etype"><option value="">All types</option></select>
+    </div>
+    <div class="sec">
+      <button class="btn small secondary" id="reset">Reset filters</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <h2 id="title">All countries</h2>
+      <div class="tabs" style="margin:0"><button id="vList" class="on">List</button><button id="vMatrix">Matrix</button></div>
+      <button class="btn small secondary" id="share">Copy link</button>
+      <button class="btn small secondary" id="csv">Export CSV</button>
+      <button class="btn small secondary" id="pdf">Print / PDF</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div id="list"></div>
+    <div id="matrix" class="hidden"></div>
+  </main>
+</div>
+
+<div class="backdrop hidden" id="backdrop"></div>
+<div class="drawer" id="drawer"></div>
+
+<script id="countries-data" type="application/json">[{"c": "AF", "n": "Afghanistan"}, {"c": "AL", "n": "Albania"}, {"c": "DZ", "n": "Algeria"}, {"c": "AS", "n": "American Samoa"}, {"c": "AD", "n": "Andorra"}, {"c": "AO", "n": "Angola"}, {"c": "AI", "n": "Anguilla"}, {"c": "AQ", "n": "Antarctica"}, {"c": "AG", "n": "Antigua and Barbuda"}, {"c": "AR", "n": "Argentina"}, {"c": "AM", "n": "Armenia"}, {"c": "AW", "n": "Aruba"}, {"c": "AU", "n": "Australia"}, {"c": "AT", "n": "Austria"}, {"c": "AZ", "n": "Azerbaijan"}, {"c": "BS", "n": "Bahamas"}, {"c": "BH", "n": "Bahrain"}, {"c": "BD", "n": "Bangladesh"}, {"c": "BB", "n": "Barbados"}, {"c": "BY", "n": "Belarus"}, {"c": "BE", "n": "Belgium"}, {"c": "BZ", "n": "Belize"}, {"c": "BJ", "n": "Benin"}, {"c": "BM", "n": "Bermuda"}, {"c": "BT", "n": "Bhutan"}, {"c": "BO", "n": "Bolivia"}, {"c": "BQ", "n": "Bonaire"}, {"c": "BA", "n": "Bosnia and Herzegovina"}, {"c": "BW", "n": "Botswana"}, {"c": "BV", "n": "Bouvet Island"}, {"c": "BR", "n": "Brazil"}, {"c": "IO", "n": "British Indian Ocean Territory"}, {"c": "VG", "n": "British Virgin Islands"}, {"c": "BN", "n": "Brunei"}, {"c": "BG", "n": "Bulgaria"}, {"c": "BF", "n": "Burkina Faso"}, {"c": "BI", "n": "Burundi"}, {"c": "KH", "n": "Cambodia"}, {"c": "CM", "n": "Cameroon"}, {"c": "CA", "n": "Canada"}, {"c": "CV", "n": "Cape Verde"}, {"c": "KY", "n": "Cayman Islands"}, {"c": "CF", "n": "Central African Republic"}, {"c": "TD", "n": "Chad"}, {"c": "CL", "n": "Chile"}, {"c": "CN", "n": "China"}, {"c": "CX", "n": "Christmas Island"}, {"c": "CC", "n": "Cocos (Keeling) Islands"}, {"c": "CO", "n": "Colombia"}, {"c": "KM", "n": "Comoros"}, {"c": "CG", "n": "Congo (Brazzaville)"}, {"c": "CK", "n": "Cook Islands"}, {"c": "CR", "n": "Costa Rica"}, {"c": "HR", "n": "Croatia"}, {"c": "CU", "n": "Cuba"}, {"c": "CW", "n": "Curaçao"}, {"c": "CY", "n": "Cyprus"}, {"c": "CZ", "n": "Czech Republic"}, {"c": "CI", "n": "Côte d’Ivoire"}, {"c": "CD", "n": "DR Congo"}, {"c": "DK", "n": "Denmark"}, {"c": "DJ", "n": "Djibouti"}, {"c": "DM", "n": "Dominica"}, {"c": "DO", "n": "Dominican Republic"}, {"c": "EC", "n": "Ecuador"}, {"c": "EG", "n": "Egypt"}, {"c": "SV", "n": "El Salvador"}, {"c": "GQ", "n": "Equatorial Guinea"}, {"c": "ER", "n": "Eritrea"}, {"c": "EE", "n": "Estonia"}, {"c": "SZ", "n": "Eswatini (Swaziland)"}, {"c": "ET", "n": "Ethiopia"}, {"c": "FK", "n": "Falkland Islands"}, {"c": "FO", "n": "Faroe Islands"}, {"c": "FJ", "n": "Fiji"}, {"c": "FI", "n": "Finland"}, {"c": "FR", "n": "France"}, {"c": "GF", "n": "French Guiana"}, {"c": "PF", "n": "French Polynesia"}, {"c": "TF", "n": "French Southern Territories"}, {"c": "GA", "n": "Gabon"}, {"c": "GM", "n": "Gambia"}, {"c": "GE", "n": "Georgia"}, {"c": "DE", "n": "Germany"}, {"c": "GH", "n": "Ghana"}, {"c": "GI", "n": "Gibraltar"}, {"c": "XX", "n": "Global / multi-country"}, {"c": "GR", "n": "Greece"}, {"c": "GL", "n": "Greenland"}, {"c": "GD", "n": "Grenada"}, {"c": "GP", "n": "Guadeloupe"}, {"c": "GU", "n": "Guam"}, {"c": "GT", "n": "Guatemala"}, {"c": "GG", "n": "Guernsey"}, {"c": "GN", "n": "Guinea"}, {"c": "GW", "n": "Guinea-Bissau"}, {"c": "GY", "n": "Guyana"}, {"c": "HT", "n": "Haiti"}, {"c": "HM", "n": "Heard Island and McDonald Islands"}, {"c": "HN", "n": "Honduras"}, {"c": "HK", "n": "Hong Kong"}, {"c": "HU", "n": "Hungary"}, {"c": "IS", "n": "Iceland"}, {"c": "IN", "n": "India"}, {"c": "ID", "n": "Indonesia"}, {"c": "IR", "n": "Iran"}, {"c": "IQ", "n": "Iraq"}, {"c": "IE", "n": "Ireland"}, {"c": "IM", "n": "Isle of Man"}, {"c": "IL", "n": "Israel"}, {"c": "IT", "n": "Italy"}, {"c": "JM", "n": "Jamaica"}, {"c": "JP", "n": "Japan"}, {"c": "JE", "n": "Jersey"}, {"c": "JO", "n": "Jordan"}, {"c": "KZ", "n": "Kazakhstan"}, {"c": "KE", "n": "Kenya"}, {"c": "KI", "n": "Kiribati"}, {"c": "KW", "n": "Kuwait"}, {"c": "KG", "n": "Kyrgyzstan"}, {"c": "LA", "n": "Laos"}, {"c": "LV", "n": "Latvia"}, {"c": "LB", "n": "Lebanon"}, {"c": "LS", "n": "Lesotho"}, {"c": "LR", "n": "Liberia"}, {"c": "LY", "n": "Libya"}, {"c": "LI", "n": "Liechtenstein"}, {"c": "LT", "n": "Lithuania"}, {"c": "LU", "n": "Luxembourg"}, {"c": "MO", "n": "Macao"}, {"c": "MG", "n": "Madagascar"}, {"c": "MW", "n": "Malawi"}, {"c": "MY", "n": "Malaysia"}, {"c": "MV", "n": "Maldives"}, {"c": "ML", "n": "Mali"}, {"c": "MT", "n": "Malta"}, {"c": "MH", "n": "Marshall Islands"}, {"c": "MQ", "n": "Martinique"}, {"c": "MR", "n": "Mauritania"}, {"c": "MU", "n": "Mauritius"}, {"c": "YT", "n": "Mayotte"}, {"c": "MX", "n": "Mexico"}, {"c": "FM", "n": "Micronesia"}, {"c": "MD", "n": "Moldova"}, {"c": "MC", "n": "Monaco"}, {"c": "MN", "n": "Mongolia"}, {"c": "ME", "n": "Montenegro"}, {"c": "MS", "n": "Montserrat"}, {"c": "MA", "n": "Morocco"}, {"c": "MZ", "n": "Mozambique"}, {"c": "MM", "n": "Myanmar"}, {"c": "NA", "n": "Namibia"}, {"c": "NR", "n": "Nauru"}, {"c": "NP", "n": "Nepal"}, {"c": "NL", "n": "Netherlands"}, {"c": "NC", "n": "New Caledonia"}, {"c": "NZ", "n": "New Zealand"}, {"c": "NI", "n": "Nicaragua"}, {"c": "NE", "n": "Niger"}, {"c": "NG", "n": "Nigeria"}, {"c": "NU", "n": "Niue"}, {"c": "NF", "n": "Norfolk Island"}, {"c": "KP", "n": "North Korea"}, {"c": "MK", "n": "North Macedonia"}, {"c": "MP", "n": "Northern Mariana Islands"}, {"c": "NO", "n": "Norway"}, {"c": "OM", "n": "Oman"}, {"c": "PK", "n": "Pakistan"}, {"c": "PW", "n": "Palau"}, {"c": "PS", "n": "Palestine"}, {"c": "PA", "n": "Panama"}, {"c": "PG", "n": "Papua New Guinea"}, {"c": "PY", "n": "Paraguay"}, {"c": "PE", "n": "Peru"}, {"c": "PH", "n": "Philippines"}, {"c": "PN", "n": "Pitcairn"}, {"c": "PL", "n": "Poland"}, {"c": "PT", "n": "Portugal"}, {"c": "PR", "n": "Puerto Rico"}, {"c": "QA", "n": "Qatar"}, {"c": "RO", "n": "Romania"}, {"c": "RU", "n": "Russia"}, {"c": "RW", "n": "Rwanda"}, {"c": "RE", "n": "Réunion"}, {"c": "BL", "n": "Saint Barthélemy"}, {"c": "SH", "n": "Saint Helena"}, {"c": "KN", "n": "Saint Kitts and Nevis"}, {"c": "LC", "n": "Saint Lucia"}, {"c": "MF", "n": "Saint Martin (French part)"}, {"c": "PM", "n": "Saint Pierre and Miquelon"}, {"c": "VC", "n": "Saint Vincent and the Grenadines"}, {"c": "WS", "n": "Samoa"}, {"c": "SM", "n": "San Marino"}, {"c": "ST", "n": "Sao Tome and Principe"}, {"c": "SA", "n": "Saudi Arabia"}, {"c": "SN", "n": "Senegal"}, {"c": "RS", "n": "Serbia"}, {"c": "SC", "n": "Seychelles"}, {"c": "SL", "n": "Sierra Leone"}, {"c": "SG", "n": "Singapore"}, {"c": "SX", "n": "Sint Maarten (Dutch part)"}, {"c": "SK", "n": "Slovakia"}, {"c": "SI", "n": "Slovenia"}, {"c": "SB", "n": "Solomon Islands"}, {"c": "SO", "n": "Somalia"}, {"c": "ZA", "n": "South Africa"}, {"c": "GS", "n": "South Georgia and the South Sandwich Islands"}, {"c": "KR", "n": "South Korea"}, {"c": "SS", "n": "South Sudan"}, {"c": "ES", "n": "Spain"}, {"c": "LK", "n": "Sri Lanka"}, {"c": "SD", "n": "Sudan"}, {"c": "SR", "n": "Suriname"}, {"c": "SJ", "n": "Svalbard and Jan Mayen"}, {"c": "SE", "n": "Sweden"}, {"c": "CH", "n": "Switzerland"}, {"c": "SY", "n": "Syria"}, {"c": "TW", "n": "Taiwan"}, {"c": "TJ", "n": "Tajikistan"}, {"c": "TZ", "n": "Tanzania"}, {"c": "TH", "n": "Thailand"}, {"c": "TL", "n": "Timor-Leste"}, {"c": "TG", "n": "Togo"}, {"c": "TK", "n": "Tokelau"}, {"c": "TO", "n": "Tonga"}, {"c": "TT", "n": "Trinidad and Tobago"}, {"c": "TN", "n": "Tunisia"}, {"c": "TR", "n": "Turkey"}, {"c": "TM", "n": "Turkmenistan"}, {"c": "TC", "n": "Turks and Caicos Islands"}, {"c": "TV", "n": "Tuvalu"}, {"c": "VI", "n": "US Virgin Islands"}, {"c": "UG", "n": "Uganda"}, {"c": "UA", "n": "Ukraine"}, {"c": "AE", "n": "United Arab Emirates"}, {"c": "GB", "n": "United Kingdom"}, {"c": "US", "n": "United States"}, {"c": "UM", "n": "United States Minor Outlying Islands"}, {"c": "UY", "n": "Uruguay"}, {"c": "UZ", "n": "Uzbekistan"}, {"c": "VU", "n": "Vanuatu"}, {"c": "VA", "n": "Vatican"}, {"c": "VE", "n": "Venezuela"}, {"c": "VN", "n": "Vietnam"}, {"c": "WF", "n": "Wallis and Futuna"}, {"c": "EH", "n": "Western Sahara"}, {"c": "YE", "n": "Yemen"}, {"c": "ZM", "n": "Zambia"}, {"c": "ZW", "n": "Zimbabwe"}, {"c": "AX", "n": "Åland Islands"}]</script>
+<script>
+/* =========================== CONFIG =========================== */
+const SUPABASE_URL  = "https://kccaysszxbxalwltfqyt.supabase.co";
+const SUPABASE_ANON = "sb_publishable_4-I-q9HdXEJ1WW8V9YRGFw_SQQGobnz";
+/* ============================================================== */
+const CATS = [
+  {id:'port_operations',       n:'Port operations',           v:'--c-port'},
+  {id:'logistics_supply_chain',n:'Logistics & supply chain',  v:'--c-log'},
+  {id:'free_economic_zones',   n:'Free & economic zones',     v:'--c-zone'},
+  {id:'drydocking',            n:'Drydocking',                v:'--c-dry'},
+  {id:'feedering',             n:'Feedering',                 v:'--c-feed'},
+  {id:'marine_services',       n:'Marine services',           v:'--c-mar'},
+];
+const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
+const GROUPS = {global_terminal:'Global terminal operators',regional:'Regional / emerging players',marine_drydock:'Marine services & drydock',logistics_zones:'Logistics & zones',other:'Other'};
+const ETYPES = {concession_award:'Concession award',acquisition:'Acquisition',divestment:'Divestment',investment:'Investment',expansion:'Expansion',greenfield:'Greenfield',partnership_jv:'Partnership / JV',contract:'Contract',service_launch:'Service launch',operational_milestone:'Operational milestone',financing:'Financing',regulatory:'Regulatory',exit_or_loss:'Exit / loss',other:'Other'};
+const COUNTRIES = JSON.parse(document.getElementById('countries-data').textContent);
+const CN = Object.fromEntries(COUNTRIES.map(c=>[c.c,c.n]));
+const $ = s=>document.querySelector(s);
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+let me=null, profile=null, competitors=[], rows=[], view='list';
+const F = {country:'', cats:new Set(), comp:'', from:'', to:'', q:'', etype:''};
+
+/* ---------- gate ---------- */
+$('#tabSignin').onclick=()=>{$('#tabSignin').classList.add('on');$('#tabRequest').classList.remove('on');$('#signinForm').classList.remove('hidden');$('#requestForm').classList.add('hidden');};
+$('#tabRequest').onclick=()=>{$('#tabRequest').classList.add('on');$('#tabSignin').classList.remove('on');$('#requestForm').classList.remove('hidden');$('#signinForm').classList.add('hidden');};
+function msg(el,t,cls){el.textContent=t;el.className='msg '+(cls||'');el.classList.remove('hidden');}
+
+$('#siSend').onclick=async()=>{
+  const email=$('#siEmail').value.trim().toLowerCase(); if(!email) return;
+  $('#siSend').disabled=true;
+  const {error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:true}});
+  $('#siSend').disabled=false;
+  if(error){msg($('#siMsg'),error.message,'err');return;}
+  msg($('#siMsg'),'Code sent. Enter the 6 digits from the e-mail.','ok');
+  $('#codeRow').classList.remove('hidden');$('#siVerify').classList.remove('hidden');$('#siSend').classList.add('hidden');$('#siCode').focus();
+};
+$('#siVerify').onclick=async()=>{
+  const email=$('#siEmail').value.trim().toLowerCase(), token=$('#siCode').value.trim();
+  const {error}=await sb.auth.verifyOtp({email,token,type:'email'});
+  if(error){msg($('#siMsg'),error.message,'err');return;}
+  boot();
+};
+$('#siCode').addEventListener('keydown',e=>{if(e.key==='Enter')$('#siVerify').click();});
+$('#siEmail').addEventListener('keydown',e=>{if(e.key==='Enter')$('#siSend').click();});
+$('#rqSend').onclick=async()=>{
+  $('#rqSend').disabled=true;
+  const {data,error}=await sb.rpc('submit_access_request',{p_email:$('#rqEmail').value,p_full_name:$('#rqName').value,p_organisation:$('#rqOrg').value,p_reason:$('#rqReason').value});
+  $('#rqSend').disabled=false;
+  if(error){msg($('#rqMsg'),error.message,'err');return;}
+  const t={submitted:'Request sent. You will receive an e-mail once approved.',already_pending:'A request for this e-mail is already pending.',already_approved:'This e-mail already has access — use "Sign in".',rate_limited:'Too many requests. Please try again later.',invalid_email:'Please enter a valid e-mail address.'}[data]||data;
+  msg($('#rqMsg'),t,data==='submitted'?'ok':'err');
+};
+$('#signout').onclick=$('#pendingOut').onclick=async()=>{await sb.auth.signOut();location.reload();};
+
+/* ---------- boot ---------- */
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){$('#gate').classList.remove('hidden');return;}
+  me=session.user;
+  const {data:p}=await sb.from('app_users').select('*').eq('email',me.email.toLowerCase()).maybeSingle();
+  profile=p;
+  $('#gate').classList.add('hidden');
+  if(!p||p.status!=='approved'){$('#pendingEmail').textContent=me.email;$('#pending').classList.remove('hidden');return;}
+  $('#who').textContent=me.email;$('#signout').classList.remove('hidden');
+  if(p.role==='admin'||p.role==='editor')$('#adminLink').classList.remove('hidden');
+  $('#app').classList.remove('hidden');
+  await loadData();
+  readHash();
+  render();
+}
+async function loadData(){
+  const c=await sb.from('competitors').select('*').eq('active',true).order('name');
+  competitors=c.data||[];
+  // page through activities (Supabase caps at 1000 rows per request)
+  rows=[];let from=0;const step=1000;
+  while(true){
+    const {data,error}=await sb.from('activities_v').select('*').order('event_date',{ascending:false}).range(from,from+step-1);
+    if(error){console.error(error);break;}
+    rows=rows.concat(data||[]);
+    if(!data||data.length<step)break; from+=step;
+  }
+  buildSidebar();
+}
+
+/* ---------- sidebar ---------- */
+function buildSidebar(){
+  // categories
+  $('#catChips').innerHTML=CATS.map(c=>`<span class="chip" data-id="${c.id}" style="--cc:var(${c.v})"><span class="dot"></span>${c.n} <span class="n"></span></span>`).join('');
+  $('#catChips').querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{const id=ch.dataset.id;F.cats.has(id)?F.cats.delete(id):F.cats.add(id);render();});
+  // competitors grouped
+  const sel=$('#comp');sel.innerHTML='<option value="">All competitors</option>';
+  for(const g of Object.keys(GROUPS)){
+    const list=competitors.filter(c=>c.group===g);if(!list.length)continue;
+    const og=document.createElement('optgroup');og.label=GROUPS[g];
+    list.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;og.appendChild(o);});
+    sel.appendChild(og);
+  }
+  sel.onchange=()=>{F.comp=sel.value;render();};
+  const et=$('#etype');et.innerHTML='<option value="">All types</option>'+Object.entries(ETYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+  et.onchange=()=>{F.etype=et.value;render();};
+  $('#q').oninput=()=>{F.q=$('#q').value.trim().toLowerCase();render();};
+  $('#dFrom').onchange=()=>{F.from=$('#dFrom').value;render();};
+  $('#dTo').onchange=()=>{F.to=$('#dTo').value;render();};
+  $('#cFilter').oninput=buildCountryList;
+  $('#cAll').onclick=()=>{F.country='';render();};
+  $('#reset').onclick=()=>{Object.assign(F,{country:'',comp:'',from:'',to:'',q:'',etype:''});F.cats.clear();$('#q').value='';$('#dFrom').value='';$('#dTo').value='';sel.value='';et.value='';render();};
+  $('#vList').onclick=()=>{view='list';render();};
+  $('#vMatrix').onclick=()=>{view='matrix';render();};
+  $('#share').onclick=()=>{writeHash();navigator.clipboard.writeText(location.href).then(()=>{$('#share').textContent='Link copied';setTimeout(()=>$('#share').textContent='Copy link',1500);});};
+  $('#csv').onclick=exportCsv;
+  $('#pdf').onclick=()=>window.print();
+  buildCountryList();
+}
+function buildCountryList(){
+  const f=($('#cFilter').value||'').toLowerCase();
+  const counts={};rows.forEach(r=>counts[r.country]=(counts[r.country]||0)+1);
+  const el=$('#countryList');
+  const list=COUNTRIES.filter(c=>!f||c.n.toLowerCase().includes(f)||c.c.toLowerCase()===f)
+    .sort((a,b)=>((counts[b.c]?1:0)-(counts[a.c]?1:0))||a.n.localeCompare(b.n));
+  let html='',sep=false;
+  for(const c of list){
+    if(!sep&&!counts[c.c]&&list.some(x=>counts[x.c])){html+='<div class="muted" style="cursor:default;font-size:11px;text-transform:uppercase;letter-spacing:.6px;padding-top:8px">No records yet</div>';sep=true;}
+    html+=`<div data-c="${c.c}" class="${F.country===c.c?'on':''}"><span>${c.n}</span><span class="n">${counts[c.c]||''}</span></div>`;
+  }
+  el.innerHTML=html;
+  el.querySelectorAll('div[data-c]').forEach(d=>d.onclick=()=>{F.country=F.country===d.dataset.c?'':d.dataset.c;render();});
+}
+
+/* ---------- filtering & render ---------- */
+function filtered(){
+  return rows.filter(r=>
+    (!F.country||r.country===F.country)&&
+    (!F.cats.size||F.cats.has(r.category))&&
+    (!F.comp||r.competitor_id===F.comp)&&
+    (!F.etype||r.event_type===F.etype)&&
+    (!F.from||r.event_date>=F.from)&&(!F.to||r.event_date<=F.to)&&
+    (!F.q||((r.title||'')+' '+(r.summary||'')+' '+(r.location||'')+' '+(r.competitor_name||'')).toLowerCase().includes(F.q))
+  );
+}
+function fmtDate(r){const d=r.event_date;if(r.date_precision==='year')return d.slice(0,4);if(r.date_precision==='month')return d.slice(0,7);return d;}
+function fmtVal(v){if(v==null)return '';return v>=1000?('US$'+(v/1000).toFixed(v%1000?1:0)+'bn'):('US$'+v+'m');}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function render(){
+  buildCountryList();
+  const data=filtered();
+  const title=(F.country?CN[F.country]:'All countries')+(F.comp?' · '+(competitors.find(c=>c.id===F.comp)||{}).name:'');
+  $('#title').textContent=title;
+  // chip counts (within current country/competitor only)
+  const base=rows.filter(r=>(!F.country||r.country===F.country)&&(!F.comp||r.competitor_id===F.comp));
+  $('#catChips').querySelectorAll('.chip').forEach(ch=>{ch.classList.toggle('on',F.cats.has(ch.dataset.id));ch.querySelector('.n').textContent=base.filter(r=>r.category===ch.dataset.id).length||'';});
+  // stats
+  const comps=new Set(data.map(r=>r.competitor_id)), ctry=new Set(data.map(r=>r.country));
+  const last=data[0]?fmtDate(data[0]):'—';
+  $('#stats').innerHTML=`<div class="stat"><b>${data.length}</b>activities</div><div class="stat"><b>${comps.size}</b>competitors</div><div class="stat"><b>${ctry.size}</b>countries</div><div class="stat"><b>${last}</b>latest</div>`;
+  $('#vList').classList.toggle('on',view==='list');$('#vMatrix').classList.toggle('on',view==='matrix');
+  $('#list').classList.toggle('hidden',view!=='list');$('#matrix').classList.toggle('hidden',view!=='matrix');
+  if(view==='list')renderList(data);else renderMatrix(data);
+  writeHash();
+}
+function renderList(data){
+  if(!data.length){$('#list').innerHTML='<div class="empty">No recorded activity matches these filters.</div>';return;}
+  let html='',cur='';
+  for(const r of data){
+    const ym=r.event_date.slice(0,7);
+    if(ym!==cur){cur=ym;const d=new Date(ym+'-01');html+=`<div class="ym">${d.toLocaleString('en',{month:'long',year:'numeric'})}</div>`;}
+    const c=CAT[r.category]||CATS[0];
+    html+=`<div class="act" style="--cc:var(${c.v})" data-id="${r.id}">
+      <div class="date">${fmtDate(r)}</div>
+      <div><div class="t">${esc(r.title)}</div>
+        <div class="meta"><span class="k">${esc(r.competitor_name)}</span><span class="flag">${r.country}</span><span>${esc(CN[r.country]||r.country)}${r.location?' · '+esc(r.location):''}</span><span>${c.n}</span><span>${ETYPES[r.event_type]||r.event_type}</span></div></div>
+      <div class="val">${fmtVal(r.value_usd_m)}</div></div>`;
+  }
+  $('#list').innerHTML=html;
+  $('#list').querySelectorAll('.act').forEach(a=>a.onclick=()=>openDrawer(a.dataset.id));
+}
+function renderMatrix(data){
+  const comps=[...new Set(data.map(r=>r.competitor_id))].map(id=>competitors.find(c=>c.id===id)).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name));
+  if(!comps.length){$('#matrix').innerHTML='<div class="empty">No data.</div>';return;}
+  let html='<table class="matrix"><tr><th>Competitor</th>'+CATS.map(c=>`<th>${c.n}</th>`).join('')+'<th>Total</th></tr>';
+  for(const c of comps){
+    const mine=data.filter(r=>r.competitor_id===c.id);
+    html+=`<tr><td>${esc(c.name)}</td>`+CATS.map(k=>{const n=mine.filter(r=>r.category===k.id).length;return `<td class="n" data-c="${c.id}" data-k="${k.id}">${n||''}</td>`;}).join('')+`<td class="mono">${mine.length}</td></tr>`;
+  }
+  html+='</table>';
+  $('#matrix').innerHTML=html;
+  $('#matrix').querySelectorAll('td.n').forEach(td=>td.onclick=()=>{if(!td.textContent)return;F.comp=td.dataset.c;$('#comp').value=F.comp;F.cats=new Set([td.dataset.k]);view='list';render();});
+}
+function openDrawer(id){
+  const r=rows.find(x=>x.id===id);if(!r)return;const c=CAT[r.category]||CATS[0];
+  $('#drawer').innerHTML=`<button class="btn small secondary close" id="dClose">✕</button>
+    <span class="pill" style="--cc:var(${c.v})">${c.n}</span> <span class="muted mono" style="font-size:13px">${fmtDate(r)}</span>
+    <h2>${esc(r.title)}</h2>
+    <div class="muted">${esc(r.competitor_name)} · ${esc(CN[r.country]||r.country)}${r.location?' · '+esc(r.location):''}</div>
+    <p style="margin-top:14px">${esc(r.summary)}</p>
+    <dl class="kv">
+      <dt>Event type</dt><dd>${ETYPES[r.event_type]||r.event_type}</dd>
+      ${r.value_usd_m!=null?`<dt>Value</dt><dd>${fmtVal(r.value_usd_m)}</dd>`:''}
+      ${r.capacity?`<dt>Capacity</dt><dd>${esc(r.capacity)}</dd>`:''}
+      ${r.partners&&r.partners.length?`<dt>Partners</dt><dd>${r.partners.map(esc).join(', ')}</dd>`:''}
+      <dt>Source</dt><dd>${r.source_url?`<a href="${esc(r.source_url)}" target="_blank" rel="noopener">${esc(r.source_name||'Open source')}</a>`:esc(r.source_name||'—')}${r.source_date?` <span class="muted mono" style="font-size:12px">(${r.source_date})</span>`:''}</dd>
+      <dt>Confidence</dt><dd>${r.confidence}</dd>
+      ${r.tags&&r.tags.length?`<dt>Tags</dt><dd>${r.tags.map(esc).join(', ')}</dd>`:''}
+      <dt>Record</dt><dd class="muted" style="font-size:12px">added ${(r.created_at||'').slice(0,10)}${r.created_by?' by '+esc(r.created_by):''}${profile&&profile.role!=='viewer'?` · <a href="admin.html#edit=${r.id}">edit</a>`:''}</dd>
+    </dl>`;
+  $('#drawer').classList.add('open');$('#backdrop').classList.remove('hidden');
+  $('#dClose').onclick=closeDrawer;
+}
+function closeDrawer(){$('#drawer').classList.remove('open');$('#backdrop').classList.add('hidden');}
+$('#backdrop').onclick=closeDrawer;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+
+/* ---------- share links ---------- */
+function writeHash(){
+  const p=new URLSearchParams();
+  if(F.country)p.set('c',F.country);if(F.cats.size)p.set('cat',[...F.cats].join(','));if(F.comp)p.set('comp',F.comp);
+  if(F.from)p.set('from',F.from);if(F.to)p.set('to',F.to);if(F.q)p.set('q',F.q);if(F.etype)p.set('et',F.etype);if(view!=='list')p.set('v',view);
+  const h=p.toString();history.replaceState(null,'',h?'#'+h:location.pathname);
+}
+function readHash(){
+  const p=new URLSearchParams(location.hash.slice(1));
+  F.country=p.get('c')||'';F.cats=new Set((p.get('cat')||'').split(',').filter(Boolean));F.comp=p.get('comp')||'';
+  F.from=p.get('from')||'';F.to=p.get('to')||'';F.q=(p.get('q')||'').toLowerCase();F.etype=p.get('et')||'';view=p.get('v')||'list';
+  $('#comp').value=F.comp;$('#dFrom').value=F.from;$('#dTo').value=F.to;$('#q').value=F.q;$('#etype').value=F.etype;
+}
+/* ---------- export ---------- */
+function exportCsv(){
+  const data=filtered();
+  const cols=['event_date','date_precision','competitor_name','country','country_name','category','event_type','title','summary','location','value_usd_m','capacity','partners','source_name','source_url','confidence'];
+  const q=v=>'"'+String(v==null?'':Array.isArray(v)?v.join('; '):v).replace(/"/g,'""')+'"';
+  const lines=[cols.join(',')].concat(data.map(r=>cols.map(k=>q(k==='country_name'?CN[r.country]:r[k])).join(',')));
+  const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='harbourline-radar-'+(F.country||'all')+'.csv';a.click();
+}
+sb.auth.onAuthStateChange((e)=>{if(e==='SIGNED_OUT'){location.reload();}});
+boot();
+</script>
+</body>
+</html>
