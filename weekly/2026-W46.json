@@ -214,6 +214,26 @@
   "confidence": "high"
  },
  {
+  "competitor": "rsgt",
+  "country": "XX",
+  "category": "port_operations",
+  "event_date": "2026-11-05",
+  "date_precision": "day",
+  "event_type": "operational_milestone",
+  "title": "SISCO Holding (RSGT parent) Q3 2026: net profit up 271% to SAR 63.1m on higher RSGT and multipurpose-terminal volumes; 9M profit SAR 148.5m",
+  "summary": "Sustained Infrastructure Holding Co. (SISCO Holding), the Tadawul-listed parent of Red Sea Gateway Terminal, reported Q3 2026 net profit of SAR 63.1m (vs SAR 17m a year earlier, +271%) on revenue of SAR 767.2m (+95%); 9M 2026 net profit rose 141% to SAR 148.5m on revenue of SAR 1.93bn. The company attributed the jump to higher cargo-handling volumes at RSGT in Jeddah and at its new Mawani-awarded Multi-Purpose Terminals, plus the gradual ramp-up of RSGTI (international, incl. Patenga/Chittagong), partly offset by a SAR 24m impairment on an RSGT operational asset and a SAR 21.8m Logipoint impairment. Argaam reported on 9 Nov 2026 that SISCO expects new record results in Q4 with sustained high handling volumes. Signals RSGT's Jeddah franchise is gaining share on Red Sea routing (Hormuz diversions) in direct competition with DP World's Jeddah South Container Terminal.",
+  "location": "Jeddah Islamic Port",
+  "value_usd_m": null,
+  "capacity": null,
+  "partners": [
+   "Saudi Ports Authority (Mawani)"
+  ],
+  "source_name": "Mubasher / Decypha (also CNBC Arabia, Argaam)",
+  "source_url": "https://decypha.com/en/news/details/SISCO-Holding-delivers-profit-growth-in-Q3--9M-26-financials/21585247?L=EN",
+  "source_date": "2026-11-05",
+  "confidence": "medium"
+ },
+ {
   "competitor": "apm-terminals",
   "country": "NL",
   "category": "port_operations",
