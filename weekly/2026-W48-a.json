@@ -1,0 +1,129 @@
+[
+  {
+    "competitor": "psa",
+    "country": "SG",
+    "category": "port_operations",
+    "event_date": "2026-11-20",
+    "date_precision": "day",
+    "event_type": "expansion",
+    "title": "PSA Singapore breaks ground on Tuas Port Phase Two (21 mega berths, 8.6 km of wharf)",
+    "summary": "PSA Singapore held the groundbreaking for Tuas Port Phase Two, the largest of the four Tuas phases by wharf length, with 21 mega berths, 8.6 km of quay and 23 m water depth designed for the largest container vessels; operations will start progressively from 2028. Group chairman Peter Voser and CEO Ong Kim Pong framed it as adding scale, automation and intelligence to the world's largest fully automated terminal. Strategically, it locks in PSA's long-term transshipment capacity lead in Southeast Asia and reinforces Singapore as the dominant hub competing with DP World's Jebel Ali and its regional network for Asia-Middle East-Europe transshipment.",
+    "location": "Tuas Port, Singapore",
+    "value_usd_m": null,
+    "capacity": "21 mega berths, 8.6 km wharf, 23 m depth",
+    "partners": [
+      "Maritime and Port Authority of Singapore"
+    ],
+    "source_name": "PSA International newsroom",
+    "source_url": "https://www.globalpsa.com/psa-singapore-breaks-ground-on-tuas-port-phase-two-to-strengthen-global-trade-connectivity/",
+    "source_date": "2026-11-20",
+    "confidence": "high"
+  },
+  {
+    "competitor": "apm-terminals",
+    "country": "NL",
+    "category": "port_operations",
+    "event_date": "2026-11-24",
+    "date_precision": "day",
+    "event_type": "expansion",
+    "title": "APM Terminals Maasvlakte II and Port of Rotterdam prepare next expansion phase adding 1.4m TEU (711 m quay)",
+    "summary": "APM Terminals Maasvlakte II and the Port of Rotterdam Authority announced they are preparing the next expansion phase of the Rotterdam terminal: 25 ha of additional terminal area, a c.711 m quay wall extension along Prinses Amaliahaven, 428 m of landside crane rail and 1.3m m3 of dredging, lifting annual capacity by about 1.4m TEU to roughly 5.4m TEU. The port authority's shareholders are expected to take an investment decision in February 2027, with tendering from March 2027 and construction from October 2027 to January 2030. It follows Hapag-Lloyd's completion earlier in November of a 25% stake in the terminal (a key Gemini hub) and cements APM Terminals' position at Europe's largest container port, where DP World is absent.",
+    "location": "Rotterdam (Maasvlakte II)",
+    "value_usd_m": null,
+    "capacity": "+1.4m TEU/yr to c.5.4m TEU/yr",
+    "partners": [
+      "Port of Rotterdam Authority",
+      "Hapag-Lloyd / Hanseatic Global Terminals"
+    ],
+    "source_name": "WorldCargo News",
+    "source_url": "https://www.worldcargonews.com/news/2026/11/apmt-mv-ii-and-port-of-rotterdam-authority-advance-terminal-development/",
+    "source_date": "2026-11-24",
+    "confidence": "medium"
+  },
+  {
+    "competitor": "apm-terminals",
+    "country": "LR",
+    "category": "port_operations",
+    "event_date": "2026-11-24",
+    "date_precision": "day",
+    "event_type": "investment",
+    "title": "APM Terminals Liberia invests US$15m in equipment and adds yard capacity to tackle Monrovia congestion",
+    "summary": "APM Terminals Liberia announced congestion-relief measures at the Freeport of Monrovia, where volumes are approaching 200,000 TEU a year (up c.30% in two years) and import dwell times have doubled to 15-16 days, cutting effective storage capacity by almost half. It has invested US$15m in new handling equipment (a mobile harbour crane, reachstackers, empty handlers, terminal trucks and spreaders due May 2027), relocated long-stay boxes and is converting yard areas to add more than 5,000 TEU of storage, working with the National Port Authority on storage-charge waivers. From January 2027 Maersk's W5A service will call Monrovia first, ending transhipment via Abidjan, which strengthens the Maersk/APMT integrated offer in West Africa against DP World's Dakar, Berbera and Luanda-style gateway strategy.",
+    "location": "Freeport of Monrovia",
+    "value_usd_m": 15,
+    "capacity": "c.200,000 TEU/yr",
+    "partners": [
+      "National Port Authority of Liberia",
+      "Maersk"
+    ],
+    "source_name": "WorldCargo News",
+    "source_url": "https://www.worldcargonews.com/news/2026/11/tackling-congestion-at-the-freeport-of-monrovia/",
+    "source_date": "2026-11-24",
+    "confidence": "medium"
+  },
+  {
+    "competitor": "ictsi",
+    "country": "ZA",
+    "category": "port_operations",
+    "event_date": "2026-11-18",
+    "date_precision": "day",
+    "event_type": "regulatory",
+    "title": "Transnet and South African government impose emergency decongestion measures at ICTSI-run Durban Gateway Terminal",
+    "summary": "On 18 November 2026 Transnet, backed by Transport Minister Barbara Creecy, announced immediate measures to relieve congestion at Durban Gateway Terminal (DCT Pier 2), where ICTSI took over operations in January 2026 under a 25-year, 49%-stake partnership: geared vessels are diverted to Berth 102, selected ships rerouted to Ngqura, Gauteng-bound imports evacuated by rail, pharmaceuticals and auto parts prioritised, and the last of six refurbished STS cranes returned to service on 20-21 November. Vessel waiting times have roughly doubled since the handover (about 16 days at anchor, up to 42 ships waiting), importers such as Metair are weighing force majeure, and Creecy said she personally phoned ICTSI's owner about the straddle-carrier shortage, with ICTSI now sourcing extra straddles globally. The episode is a major reputational setback for ICTSI's flagship African concession and the template for Transnet's private-sector port partnerships; it strengthens the hand of rivals such as DP World (which lost the Durban bid) in future South African PSP tenders.",
+    "location": "Durban",
+    "value_usd_m": null,
+    "capacity": "DCT Pier 2 target 2.8m TEU/yr; ~half of South Africa's container volumes",
+    "partners": [
+      "Transnet",
+      "Transnet National Ports Authority",
+      "Transnet Port Terminals",
+      "South African Department of Transport"
+    ],
+    "source_name": "Eyewitness News (EWN) / SAnews",
+    "source_url": "https://www.ewn.co.za/2026/11/18/i-wont-stop-until-it-gets-resolved-creecy-outlines-interventions-at-crisis-hit-durban-port",
+    "source_date": "2026-11-18",
+    "confidence": "high"
+  },
+  {
+    "competitor": "arise-iip",
+    "country": "GA",
+    "category": "free_economic_zones",
+    "event_date": "2026-11-19",
+    "date_precision": "day",
+    "event_type": "other",
+    "title": "Arise IIP / GSEZ in talks with Gabon on a new Kango special industrial zone (manganese storage, wood processing, biochar)",
+    "summary": "On 19 November 2026 an Arise delegation led by country director Igor Simard, with GSEZ managing director Gaurav Aggarwal, met Gabon's Minister of Commerce, Industry and Transformation Emmanuel Eyeghe Nze to discuss partnership terms for a proposed special industrial zone at Kango (Estuaire province) that would include manganese storage infrastructure, a wood-processing cluster and a biochar unit; the project was presented to the housing ministry on 13 November and still depends on land allocation. GSEZ, developer of the Nkok SEZ, expressed interest in developing the site, which would replicate the Nkok model. No investment figure, timeline or job target has been announced. Strategically, this would deepen Arise's near-monopoly on Gabon's industrial-zone and mineral logistics ecosystem (Nkok, Owendo mineral port), a market where DP World has no footprint.",
+    "location": "Kango, Estuaire",
+    "value_usd_m": null,
+    "capacity": null,
+    "partners": [
+      "Government of Gabon (Ministry of Commerce, Industry and Transformation)",
+      "Gabon Special Economic Zone (GSEZ)"
+    ],
+    "source_name": "Gabonreview",
+    "source_url": "https://www.gabonreview.com/industrie-le-gabon-veut-etendre-le-modele-de-nkok-a-kango/",
+    "source_date": "2026-11-19",
+    "confidence": "low"
+  },
+  {
+    "competitor": "agl-bollore",
+    "country": "GA",
+    "category": "logistics_supply_chain",
+    "event_date": "2026-11-15",
+    "date_precision": "day",
+    "event_type": "other",
+    "title": "AGL reaffirms role as logistics partner for Gabon's Belinga-Kobe Kobe integrated port and logistics hub during World Bank visit",
+    "summary": "On 15 November 2026 a delegation led by World Bank Vice President for West and Central Africa Ousmane Diagana and Gabon's Minister of State for Transport, Merchant Marine and Logistics Ulrich Manfoumbi Manfoumbi visited the Kobe Kobe operational base, where Africa Global Logistics reaffirmed its commitment to bring its logistics expertise to the integrated Belinga-Kobe Kobe project combining industrial activity, port capacity and logistics solutions tied to the Belinga iron-ore development. No investment amount was disclosed and the visit does not constitute a World Bank financing decision; the operational and financial structure of the project components remains to be defined. The event signals AGL (via its Owendo port and Gabon logistics base) positioning itself as the state's logistics partner for a future iron-ore export corridor, a greenfield bulk-port opportunity in a country where DP World is absent.",
+    "location": "Kobe Kobe / Belinga",
+    "value_usd_m": null,
+    "capacity": null,
+    "partners": [
+      "Government of Gabon",
+      "World Bank"
+    ],
+    "source_name": "Gabon Media Time",
+    "source_url": "https://gabonmediatime.com/projet-belinga-kobe-kobe-agl-mobilise-aux-cotes-de-letat-gabonais-pour-developper-un-pole-logistique-et-portuaire/",
+    "source_date": "2026-11-19",
+    "confidence": "low"
+  }
+]
