@@ -1,0 +1,290 @@
+[
+  {
+    "competitor": "gulftainer",
+    "country": "TH",
+    "category": "port_operations",
+    "event_date": "2026-11-24",
+    "date_precision": "day",
+    "event_type": "acquisition",
+    "title": "Gulftainer completes acquisition and operational takeover of Suksawat Terminal, Bangkok",
+    "summary": "Gulftainer announced it has completed the acquisition and taken operational control of Suksawat Terminal, a river container terminal on the Chao Phraya in Samut Prakan serving Greater Bangkok, following the binding agreement signed in September 2026. The terminal handles barge and feeder moves between Bangkok's industrial zones and the deep-sea ports of Laem Chabang and Map Ta Phut; the agreement was signed in Singapore by Group CEO Farid Belbouab and Suksawat director Thor Soon Hock. Stake, price and capacity were not disclosed. The deal is Gulftainer's first asset in Thailand and ASEAN and extends its GT Ports/GT Logistics/GT Parks/GT Lines platform into Southeast Asia, where DP World operates Laem Chabang and inland logistics.",
+    "location": "Suksawat Terminal, Samut Prakan / Bangkok",
+    "value_usd_m": null,
+    "capacity": "",
+    "partners": [
+      "Suksawat Terminal"
+    ],
+    "source_name": "Food Business MEA / IndexBox (Gulftainer statement)",
+    "source_url": "https://www.foodbusinessmea.com/gulftainer-completes-suksawat-terminal-acquisition-in-bangkok/",
+    "source_date": "2026-11-25",
+    "confidence": "medium"
+  },
+  {
+    "competitor": "adani-ports",
+    "country": "NL",
+    "category": "port_operations",
+    "event_date": "2026-11-26",
+    "date_precision": "day",
+    "event_type": "financing",
+    "title": "APSEZ launches EUR 2.775bn syndicated acquisition loan for Evos purchase, MUFG sole underwriter",
+    "summary": "APSEZ has launched general syndication of a EUR 2.775bn (approx. USD 3.05bn) loan package backing its EUR 2.56bn EV acquisition of European liquid-storage operator Evos B.V., with MUFG as sole underwriter and sub-underwriting commitments (EUR 500m minimum tickets) due 18 December 2026. The package comprises a EUR 750m five-year term loan (facility A, borrower Adani International Ports Holdings, 155bp over Euribor), a EUR 750m 18-month bridge (facility B, borrower Continental Energy Terminals) and a EUR 1.275bn 18-month bridge (facility C) to refinance non-consenting Evos creditors; APSEZ guarantees facilities A and B. The syndication is the next step after the MUFG bridge commitment reported on 12 November and shows APSEZ moving quickly to fund its first large European port-terminal platform (eight terminals in NL, BE, DE, ES and MT), a direct push into DP World's European and liquid-bulk territory.",
+    "location": "Netherlands / Europe (Evos terminals)",
+    "value_usd_m": 3050,
+    "capacity": "Evos: 8 terminals, 452 tanks, 63 vessel/barge berths",
+    "partners": [
+      "MUFG",
+      "Evos B.V.",
+      "Continental Energy Terminals",
+      "Adani International Ports Holdings"
+    ],
+    "source_name": "Wisevoter (citing IFR)",
+    "source_url": "https://wisevoter.com/world/2026/11/26/apsez-launches-financing-evos-acquisition",
+    "source_date": "2026-11-26",
+    "confidence": "low"
+  },
+  {
+    "competitor": "cochin-shipyard",
+    "country": "IN",
+    "category": "drydocking",
+    "event_date": "2026-11-18",
+    "date_precision": "day",
+    "event_type": "operational_milestone",
+    "title": "Cochin Shipyard lays keel for first of two 70t bollard-pull ASTDS tugs for Polestar Maritime",
+    "summary": "On 18 November 2026 Cochin Shipyard Limited (CSL) held the keel-laying ceremony in Kochi for the first of two Robert Allan-designed ASTDS 70-tonne bollard-pull harbour tugs (33 m LOA, 2 x 1,838 kW Niigata engines) ordered by Polestar Maritime in July 2025. CSL is also building two Green Tug Transition Programme tugs for Polestar; the CSL group's tug order book now stands at 17 ASTDS tugs and six green tugs. The milestone underlines CSL's growing position as India's domestic harbour-tug builder, a segment where DP World's P&O Maritime Logistics and Drydocks World compete for Gulf and Indian Ocean tonnage.",
+    "location": "Kochi, Kerala",
+    "value_usd_m": null,
+    "capacity": "2 x ASTDS 70T BP tugs; CSL group order book 17 ASTDS tugs + 6 green tugs",
+    "partners": [
+      "Polestar Maritime Ltd",
+      "Robert Allan Ltd"
+    ],
+    "source_name": "Cochin Shipyard press release",
+    "source_url": "https://cochinshipyard.in/uploads/postcontent/29d45a812b275adda4b317d8d4fd410b.pdf",
+    "source_date": "2026-11-18",
+    "confidence": "high"
+  },
+  {
+    "competitor": "damen",
+    "country": "VN",
+    "category": "marine_services",
+    "event_date": "2026-11-19",
+    "date_precision": "day",
+    "event_type": "operational_milestone",
+    "title": "Damen delivers 90 m hybrid CSOV Purus Vortex to Purus from Vietnam yard",
+    "summary": "Damen Shipyards Group handed over the 90-metre commissioning service operation vessel Purus Vortex, built at its Ha Long yard in Vietnam, to offshore-wind operator Purus; the vessel has departed Vietnam for IJmuiden, Netherlands, to work on a North Sea wind project. The methanol-ready, hybrid diesel-electric CSOV accommodates up to 120 people for 30-day offshore stays and carries a motion-compensated gangway. It is the first Damen-built CSOV in Purus's fleet and follows Purus's 2023 eight-vessel order with Damen, reinforcing Damen's position in the offshore-wind support segment.",
+    "location": "Damen Ha Long shipyard, Vietnam",
+    "value_usd_m": null,
+    "capacity": "90 m CSOV, 120 POB, 30 days endurance",
+    "partners": [
+      "Purus"
+    ],
+    "source_name": "offshoreWIND.biz",
+    "source_url": "https://www.offshorewind.biz/2026/11/19/purus-takes-delivery-of-first-damen-csov",
+    "source_date": "2026-11-19",
+    "confidence": "medium"
+  },
+  {
+    "competitor": "damen",
+    "country": "NL",
+    "category": "marine_services",
+    "event_date": "2026-11-20",
+    "date_precision": "day",
+    "event_type": "operational_milestone",
+    "title": "Damen delivers Shoalbuster 3209 'Martello' to Italian towage firm Cafimar",
+    "summary": "Damen Shipyard Gorinchem delivered the stock-built Shoalbuster 3209 Martello (32.27 m x 9.10 m, 8 t crane, hydraulic waterfall winch) to Naples-based towage company Cafimar just four months after contract signing in July 2026. The multi-purpose vessel will perform oceangoing and harbour towage, mooring, anchor handling and buoy/pipe handling worldwide. It is the first Shoalbuster delivered to an Italian owner and Cafimar's second Damen vessel after the ASD Tug 3212 Matador (2023), showing Damen's stock-building model winning Mediterranean towage customers.",
+    "location": "Gorinchem, Netherlands",
+    "value_usd_m": null,
+    "capacity": "Shoalbuster 3209, 32.27 m",
+    "partners": [
+      "Cafimar"
+    ],
+    "source_name": "Damen Shipyards press release",
+    "source_url": "https://www.damen.com/insights-center/news/cafimar-receives-damen-shoalbuster-3209",
+    "source_date": "2026-11-20",
+    "confidence": "high"
+  },
+  {
+    "competitor": "damen",
+    "country": "NL",
+    "category": "marine_services",
+    "event_date": "2026-11-20",
+    "date_precision": "day",
+    "event_type": "partnership_jv",
+    "title": "Damen Naval and Alewijnse deepen partnership for Royal Netherlands Navy programmes",
+    "summary": "At the NEDS 2026 defence exhibition Damen Naval and electrical integrator Alewijnse announced an expanded long-term collaboration covering future Royal Netherlands Navy shipbuilding programmes, starting with the Amphibious Transport Ship (ATS) that will replace HNLMS Rotterdam and Johan de Witt, for which Alewijnse will integrate all onboard electrical systems. The companies say early supplier involvement will keep programmes on schedule and retain naval shipbuilding capability in the Netherlands. The move shores up Damen's naval order pipeline after the loss of the German F126 frigate programme.",
+    "location": "Netherlands",
+    "value_usd_m": null,
+    "capacity": "",
+    "partners": [
+      "Alewijnse",
+      "Royal Netherlands Navy / Dutch Ministry of Defence"
+    ],
+    "source_name": "European Security & Defence",
+    "source_url": "https://euro-sd.com/2026/11/news/sea/54750/damen-naval-alewijnse",
+    "source_date": "2026-11-20",
+    "confidence": "medium"
+  },
+  {
+    "competitor": "damen",
+    "country": "NL",
+    "category": "marine_services",
+    "event_date": "2026-11-24",
+    "date_precision": "day",
+    "event_type": "contract",
+    "title": "Windcat orders second Innovation Series MP-ASV from Damen",
+    "summary": "On 24 November 2026 Windcat (part of CMB.TECH) signed with Damen Shipyards Group for a second Multi-Purpose Accommodation Support Vessel (MP-ASV) in the jointly developed Innovation Series, exercising part of a five-vessel option attached to the first order of November 2025. The 102 m x 20 m DP2+ vessel has 111 cabins for 190 persons, a 150 t subsea / 15 t motion-compensated crane, a 3D motion-compensated gangway, batteries, a dual-fuel hydrogen auxiliary genset and 150-day endurance, targeting offshore wind, cable repair, flotel and ROV support work. Contract value and delivery date were not disclosed; the repeat order confirms demand for Damen's new offshore-energy support class.",
+    "location": "Netherlands",
+    "value_usd_m": null,
+    "capacity": "1 x MP-ASV, 102 m, 190 POB",
+    "partners": [
+      "Windcat",
+      "CMB.TECH"
+    ],
+    "source_name": "Damen Shipyards press release",
+    "source_url": "https://www.damen.com/insights-center/news/second-mpasv-confirmed-for-windcat-and-damen-partnership",
+    "source_date": "2026-11-24",
+    "confidence": "high"
+  },
+  {
+    "competitor": "damen",
+    "country": "NL",
+    "category": "marine_services",
+    "event_date": "2026-11-26",
+    "date_precision": "day",
+    "event_type": "service_launch",
+    "title": "Damen-built 'Enforcer' christened and commissioned for Netherlands Coastguard under Multraship charter",
+    "summary": "On 26 November 2026 Multraship Towage & Salvage christened the Damen-built high-speed offshore support vessel Enforcer at its Terneuzen headquarters, after which the Director of the Netherlands Coastguard formally commissioned her into service. Enforcer is owned, crewed and maintained by Multraship and operates for the Coastguard under a time charter arranged through Rijkswaterstaat's Rijksrederij, supporting search and rescue, salvage, emergency towing and surveillance in the North Sea; Multraship already supplies three emergency response and towing vessels to the Dutch government. The deal extends the Damen-Multraship relationship and expands Dutch government emergency-towage capacity as offshore wind and gas activity grows.",
+    "location": "Terneuzen, Netherlands",
+    "value_usd_m": null,
+    "capacity": "1 x high-speed offshore support vessel",
+    "partners": [
+      "Multraship Towage & Salvage",
+      "Netherlands Coastguard",
+      "Rijkswaterstaat (Rijksrederij)"
+    ],
+    "source_name": "Damen Shipyards press release",
+    "source_url": "https://www.damen.com/insights-center/news/multraship-christens-enforcer-for-dutch-government-operations",
+    "source_date": "2026-11-27",
+    "confidence": "high"
+  },
+  {
+    "competitor": "boskalis-smit",
+    "country": "IN",
+    "category": "marine_services",
+    "event_date": "2026-11-19",
+    "date_precision": "day",
+    "event_type": "operational_milestone",
+    "title": "SMIT Salvage refloats cyclone-grounded bulk carrier Sigma Pearl off Kakinada",
+    "summary": "Boskalis subsidiary SMIT Salvage, working with partner MERC, refloated the bulk carrier Sigma Pearl, which lost propulsion and grounded near Antarvedi/Kakinada on India's east coast on 28 October 2026 during Cyclone Arnab. Boskalis mobilised its 300 t bollard-pull DP2 anchor-handling salvage tug BOKA Centre with a salvage team and equipment; after deballasting, the ship was pulled free at the first attempt using a c.2,000 m Dyneema towline and towed to anchorage. The successful job (reported 19 November; exact refloating date not published) showcases Boskalis's Indian Ocean salvage reach against DP World-affiliated marine service providers.",
+    "location": "Kakinada, Andhra Pradesh",
+    "value_usd_m": null,
+    "capacity": "",
+    "partners": [
+      "MERC"
+    ],
+    "source_name": "Heavy Lift News",
+    "source_url": "https://www.heavyliftnews.com/boskalis-subsidiary-smit-salvage-completes-rapid-refloating-operation-in-india/",
+    "source_date": "2026-11-19",
+    "confidence": "low"
+  },
+  {
+    "competitor": "boskalis-smit",
+    "country": "GY",
+    "category": "marine_services",
+    "event_date": "2026-11-23",
+    "date_precision": "day",
+    "event_type": "operational_milestone",
+    "title": "Boskalis completes 1,700 m deepwater hook-up of MODEC FPSO Errea Wittu offshore Guyana",
+    "summary": "Boskalis reported completion of the hook-up of MODEC's new FPSO Errea Wittu to pre-installed subsea infrastructure at about 1,700 m water depth in the Stabroek Block offshore Guyana. The construction support vessel BOKA Sub C executed the installation while the Boskalis tugs BOKA Defender, BOKA Keeper, BOKA Sweeper and BOKA Forward held the FPSO in position; three of the tugs had towed the unit from Singapore. The job, a deepwater milestone for Boskalis a year after it delivered the FPSO One Guyana to the same field, cements its position in Guyana's offshore services market where Boskalis's Smit Lamnalco also holds an ExxonMobil terminal-support contract (reported 23 November; precise completion date not stated).",
+    "location": "Stabroek Block, offshore Guyana",
+    "value_usd_m": null,
+    "capacity": "",
+    "partners": [
+      "MODEC"
+    ],
+    "source_name": "DredgeWire",
+    "source_url": "https://dredgewire.com/boskalis-boka-sub-c-completes-fpso-errea-wittu-hook-up-installation-at-1700-meter-depth-offshore-guyana/",
+    "source_date": "2026-11-23",
+    "confidence": "low"
+  },
+  {
+    "competitor": "maersk-logistics",
+    "country": "MA",
+    "category": "logistics_supply_chain",
+    "event_date": "2026-11-24",
+    "date_precision": "day",
+    "event_type": "partnership_jv",
+    "title": "Maersk and Moroccan National Rail (ONCF) sign MoU on rail and integrated logistics in Morocco",
+    "summary": "A.P. Moller-Maersk and Morocco's public railway operator ONCF signed a Memorandum of Understanding in Rabat on 24 November 2026 to jointly develop rail transport and integrated logistics solutions in Morocco. The MoU targets higher rail use for containerised import/export flows between Morocco's main ports (notably Tanger Med) and its industrial regions, including new automotive and aerospace production sites, to relieve road congestion and cut inland emissions. No volumes or investment figures were disclosed. Strategically, it deepens Maersk's landside/inland logistics footprint in a market where DP World does not operate a port but competes for North Africa-Europe logistics flows.",
+    "location": "Rabat / Tanger Med, Morocco",
+    "value_usd_m": null,
+    "capacity": "ONCF network: 2,295 km of rail, 23m tonnes freight (2025)",
+    "partners": [
+      "ONCF (Office National des Chemins de Fer)"
+    ],
+    "source_name": "Maersk press release",
+    "source_url": "https://www.maersk.com/news/articles/2026/11/24/moroccan-national-rail-maersk-mou-rail-integrated-logistics-morocco",
+    "source_date": "2026-11-24",
+    "confidence": "high"
+  },
+  {
+    "competitor": "dhl",
+    "country": "XX",
+    "category": "logistics_supply_chain",
+    "event_date": "2026-11-24",
+    "date_precision": "day",
+    "event_type": "operational_milestone",
+    "title": "DHL Express Europe reports 8% growth in Heavy Weight Express volumes on tech, healthcare and energy demand",
+    "summary": "On 24 November 2026 DHL Express Europe reported that daily shipment weight on its Heavy Weight Express (HWX) product, launched at the start of 2026 for time-critical door-to-door shipments of up to 3,000 kg, rose 8% over the past six months. Growth is led by technology/semiconductors, advanced manufacturing, life sciences and healthcare, infrastructure and energy customers moving heavier, high-value components and equipment. DHL links the trend to its Smart Industrial Growth Strategy and its owned air network of about 300 aircraft; no new facilities or investment figures were disclosed. It signals DHL pushing express into heavier B2B freight that overlaps with the air-forwarding and project-cargo segments DP World Logistics targets.",
+    "location": "Europe (regional)",
+    "value_usd_m": null,
+    "capacity": "HWX: up to 1,000 kg per piece / 3,000 kg per shipment",
+    "partners": [],
+    "source_name": "DHL Group press release",
+    "source_url": "https://group.dhl.com/en/media-relations/press-releases/2026/dhl-express-europe-grows-on-strong-demand-from-technology-manufacturing-life-sciences-and-healthcare-and-energy.html",
+    "source_date": "2026-11-24",
+    "confidence": "high"
+  },
+  {
+    "competitor": "kuehne-nagel",
+    "country": "DE",
+    "category": "logistics_supply_chain",
+    "event_date": "2026-11-24",
+    "date_precision": "day",
+    "event_type": "service_launch",
+    "title": "Kuehne+Nagel adds FAIR@Link truck slot booking at new Frankfurt Airport healthcare facility",
+    "summary": "Kuehne+Nagel has deployed the FAIR@Link slot-booking and dock-management system at its new healthcare logistics centre in CargoCity South at Frankfurt Airport, which opened earlier in 2026 with temperature-controlled staging and dedicated pharma handling. Truck drivers now pre-register and book time windows, with handling time calculated from shipment data, to cut waiting times, smooth peaks and give K+N utilisation and punctuality data. K+N is considering rolling the system out to its other Frankfurt facilities and automating gate access. The move strengthens K+N's pharma air-freight gateway at Europe's largest cargo airport, a segment DP World is building through its own healthcare/cold-chain logistics push.",
+    "location": "Frankfurt Airport, CargoCity South, Germany",
+    "value_usd_m": null,
+    "capacity": "",
+    "partners": [
+      "FAIR@Link",
+      "Fraport"
+    ],
+    "source_name": "Air Cargo News",
+    "source_url": "https://www.aircargonews.net/ground-handler/2026/11/kn-adds-slot-booking-at-frankfurt-airport-healthcare-facility/",
+    "source_date": "2026-11-24",
+    "confidence": "medium"
+  },
+  {
+    "competitor": "ceva-logistics",
+    "country": "IT",
+    "category": "logistics_supply_chain",
+    "event_date": "2026-11-18",
+    "date_precision": "day",
+    "event_type": "expansion",
+    "title": "CEVA Logistics opens 50,000 sqm warehouse at Castel San Giovanni, Italy, for Daikin",
+    "summary": "CEVA Logistics opened a new 50,000 sqm contract-logistics warehouse at Castel San Giovanni near Piacenza, in one of Italy's main logistics corridors, under a multi-year lease with developer CTP. The site supports an expanded logistics partnership with HVAC maker Daikin, following a 27,000 sqm Daikin-dedicated warehouse CEVA opened earlier in 2026 at Tortola de Henares, Spain. CEVA now operates 33 facilities totalling about 526,000 sqm in Italy. The opening shows CMA CGM's logistics arm continuing to add contract-logistics capacity in Southern Europe, a region where DP World Logistics has a limited warehousing footprint.",
+    "location": "Castel San Giovanni (Piacenza), Italy",
+    "value_usd_m": null,
+    "capacity": "50,000 sqm",
+    "partners": [
+      "Daikin",
+      "CTP"
+    ],
+    "source_name": "Container News",
+    "source_url": "https://container-news.com/ceva-logistics-opens-new-50000-m%C2%B2-warehouse-in-italy/",
+    "source_date": "2026-11-18",
+    "confidence": "medium"
+  }
+]
